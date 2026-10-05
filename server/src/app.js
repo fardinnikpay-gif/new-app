@@ -4,6 +4,8 @@ import cors from "cors";
 import morgan from "morgan";
 import { config } from "./config/env.js";
 import { sendSuccess } from "./utils/apiResponse.js";
+import { applySecurity } from "./middleware/security.js";
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
@@ -18,6 +20,9 @@ if (!config.isTest) app.use(morgan(config.isProduction ? "combined" : "dev"));
 app.use(express.json({ limit: "100kb" }));
 app.use(cookieParser());
 
+// helmet, body sanitizing, general rate limiter
+applySecurity(app);
+
 app.get("/api/health", (req, res) => {
   sendSuccess(res, 200, "Server is healthy", {
     status: "ok",
@@ -25,5 +30,10 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Routes will be mounted here in later steps
+
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;
