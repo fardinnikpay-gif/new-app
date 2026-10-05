@@ -7,7 +7,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^\+[1-9]\d{6,14}$/; // E.164, normalized by the Zod schema (step 9)
 const BCRYPT_ROUNDS = config.isTest ? 4 : 12; // low cost only to keep tests fast
 const RESET_TOKEN_TTL_MS = 15 * 60 * 1000;
-const MAX_ADDRESSES = 10;
+export const MAX_ADDRESSES = 5;
 
 // A sparse unique index still indexes null and "", so empty input must become
 // "field missing" or two phone-only users would collide on email.
@@ -57,6 +57,8 @@ const userSchema = new mongoose.Schema(
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     resetPasswordToken: { type: String, select: false },
     resetPasswordExpire: { type: Date, select: false },
+    // Set when an existing user changes password: older JWTs are rejected by protect
+    passwordChangedAt: { type: Date },
   },
   {
     timestamps: true,
@@ -65,6 +67,7 @@ const userSchema = new mongoose.Schema(
         delete ret.password;
         delete ret.resetPasswordToken;
         delete ret.resetPasswordExpire;
+        delete ret.passwordChangedAt;
         delete ret.__v;
         return ret;
       },
@@ -79,11 +82,12 @@ userSchema.pre("validate", function () {
 });
 
 // Hash the password only when it changed
+// Hash the password only when it changed
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, BCRYPT_ROUNDS);
+  if (!this.isNew) this.passwordChangedAt = new Date();
 });
-
 /** Same hashing for creating and looking up reset tokens (used in step 12). */
 userSchema.statics.hashResetToken = (rawToken) =>
   crypto.createHash("sha256").update(String(rawToken)).digest("hex");

@@ -37,6 +37,11 @@ export const protect = asyncHandler(async (req, res, next) => {
   const user = await User.findById(payload.id);
   if (!user) throw new ApiError(401, UNAUTHENTICATED); // deleted user
 
+  // A password change/reset invalidates every token issued before it (iat is in seconds)
+  if (user.passwordChangedAt && payload.iat < Math.floor(user.passwordChangedAt.getTime() / 1000)) {
+    throw new ApiError(401, UNAUTHENTICATED);
+  }
+
   req.user = user;
   next();
 });
