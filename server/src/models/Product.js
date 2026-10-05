@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import imageSchema from "./imageSchema.js";
+import { moneyValidator } from "../utils/money.js";
 
 const MAX_IMAGES = 6;
 const MAX_VARIANTS = 100;
@@ -10,10 +11,6 @@ const MAX_VARIANTS = 100;
 export const normalizeSize = (value) => String(value ?? "").trim().toUpperCase();
 export const normalizeColor = (value) => String(value ?? "").trim().toLowerCase();
 
-// At most 2 decimals, so cent math in the cart/payment steps is exact
-const isMoney = (value) =>
-  value == null || (Number.isFinite(value) && Math.abs(value * 100 - Math.round(value * 100)) < 1e-6);
-const moneyValidator = { validator: isMoney, message: "Must be a valid amount with at most 2 decimals" };
 
 const variantSchema = new mongoose.Schema(
   {
