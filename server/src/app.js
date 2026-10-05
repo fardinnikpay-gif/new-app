@@ -7,6 +7,8 @@ import { sendSuccess } from "./utils/apiResponse.js";
 import { applySecurity } from "./middleware/security.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
+import authRoutes from "./routes/authRoutes.js";
+
 const app = express();
 
 // Behind a reverse proxy (Render, Nginx, ...) so req.ip and secure cookies work
@@ -31,6 +33,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+app.use("/api/auth", authRoutes);
 // Routes will be mounted here in later steps
 
 app.use(notFound);

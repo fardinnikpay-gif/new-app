@@ -66,6 +66,8 @@ export const validateEnv = (env = process.env) => {
     invalid.push("JWT_SECRET must be at least 32 characters in production");
   }
   const jwtExpires = str("JWT_EXPIRES", "7d");
+  // jsonwebtoken reads a unitless string like "3600" as milliseconds
+  if (!/^\d+[smhdw]$/.test(jwtExpires)) invalid.push("JWT_EXPIRES must be a number plus a unit, e.g. 30m, 12h or 7d");
 
   // --- CORS origins ---
   const clientUrl = origin("CLIENT_URL");
