@@ -6,7 +6,7 @@ import { config } from "../config/env.js";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^\+[1-9]\d{6,14}$/; // E.164, normalized by the Zod schema (step 9)
 const BCRYPT_ROUNDS = config.isTest ? 4 : 12; // low cost only to keep tests fast
-const RESET_TOKEN_TTL_MS = 15 * 60 * 1000;
+export const RESET_TOKEN_TTL_MS = 15 * 60 * 1000;
 export const MAX_ADDRESSES = 5;
 
 // A sparse unique index still indexes null and "", so empty input must become
