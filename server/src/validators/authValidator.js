@@ -57,3 +57,13 @@ export const loginSchema = z.object({
     .transform((value) => (value.includes("@") ? value.toLowerCase() : normalizePhone(value))),
   password: z.string().min(1, "Password is required").max(128),
 });
+
+
+export const forgotPasswordSchema = z.object({ email: emailSchema });
+
+// Reset tokens are 32 random bytes in hex (see User.createPasswordResetToken)
+export const resetTokenParamSchema = z.object({
+  token: z.string().regex(/^[a-f0-9]{64}$/i, "Invalid or expired reset token"),
+});
+
+export const resetPasswordSchema = z.object({ password: passwordSchema });

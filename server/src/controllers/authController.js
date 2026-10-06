@@ -1,6 +1,11 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendSuccess } from "../utils/apiResponse.js";
-import { registerUser, loginUser } from "../services/authService.js";
+import {
+  registerUser,
+  loginUser,
+  requestPasswordReset,
+  resetPasswordWithToken,
+} from "../services/authService.js";
 import { signToken, setAuthCookie, clearAuthCookie } from "../utils/token.js";
 
 export const register = asyncHandler(async (req, res) => {
@@ -22,4 +27,17 @@ export const logout = asyncHandler(async (req, res) => {
 
 export const getMe = asyncHandler(async (req, res) => {
   sendSuccess(res, 200, "OK", { user: req.user });
+});
+
+const FORGOT_PASSWORD_MESSAGE = "If an account with that email exists, a password reset link has been sent";
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  await requestPasswordReset(req.body.email);
+  sendSuccess(res, 200, FORGOT_PASSWORD_MESSAGE); // identical for existing and unknown emails
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { user, token } = await resetPasswordWithToken(req.params.token, req.body.password);
+  setAuthCookie(res, token); // signs the user in again
+  sendSuccess(res, 200, "Password reset successfully", { user });
 });

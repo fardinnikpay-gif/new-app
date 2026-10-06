@@ -27,3 +27,14 @@ export const authLimiter = buildLimiter({
   limit: 10,
   message: "Too many attempts, please try again in 15 minutes",
 });
+
+
+/**
+ * forgot-password and reset-password. Separate counter from authLimiter on purpose:
+ * someone locked out by failed logins must still be able to ask for a reset.
+ */
+export const passwordResetLimiter = buildLimiter({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  message: "Too many password reset attempts, please try again in 15 minutes",
+});
