@@ -1,7 +1,10 @@
 import cloudinary from "../config/cloudinary.js";
 import { ApiError } from "../utils/ApiError.js";
 
-const FOLDER = "clothing-store/products";
+export const UPLOAD_FOLDERS = {
+  products: "clothing-store/products",
+  categories: "clothing-store/categories",
+};
 
 const toDataUri = (file) =>
   `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
