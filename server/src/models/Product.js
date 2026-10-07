@@ -63,6 +63,9 @@ const productSchema = new mongoose.Schema(
         { validator: hasUniqueVariants, message: "Each size/color combination must be unique" },
       ],
     },
+    // Derived in pre("validate") as discountPrice ?? price, so price filters and price sorting
+    // use what the customer actually pays. Never set it from request input.
+    finalPrice: { type: Number },
     isActive: { type: Boolean, default: true },
     isFeatured: { type: Boolean, default: false },
   },
@@ -86,6 +89,7 @@ productSchema.index(
 );
 productSchema.index({ category: 1 });
 productSchema.index({ price: 1 });
+productSchema.index({ finalPrice: 1 });
 productSchema.index({ createdAt: -1 });
 
 // Runs on doc.save()/validate() only: update flows must load the doc and save it
@@ -93,6 +97,7 @@ productSchema.pre("validate", function () {
   if (this.discountPrice != null && this.price != null && this.discountPrice >= this.price) {
     this.invalidate("discountPrice", "Discount price must be less than price");
   }
+  if (this.price != null) this.finalPrice = this.discountPrice ?? this.price;
 });
 
 productSchema.virtual("totalStock").get(function () {

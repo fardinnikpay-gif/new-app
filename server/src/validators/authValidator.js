@@ -5,7 +5,7 @@ const MAX_PASSWORD_BYTES = 72; // bcrypt silently ignores everything after 72 by
 
 // Empty strings from forms mean "not provided"
 const emptyToUndefined = (value) => (typeof value === "string" && value.trim() === "" ? undefined : value);
-const optional = (schema) => z.preprocess(emptyToUndefined, schema.optional());
+export const optional = (schema) => z.preprocess(emptyToUndefined, schema.optional());
 
 // Persian (۰-۹) and Arabic-Indic (٠-٩) digits -> ASCII digits
 const toAsciiDigits = (text) =>
