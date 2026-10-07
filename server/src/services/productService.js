@@ -1,116 +1,118 @@
-import Product, { normalizeSize, normalizeColor } from "../models/Product.js";
+import Product from "../models/Product.js";
 import Category from "../models/Category.js";
+import User from "../models/User.js";
 import { ApiError } from "../utils/ApiError.js";
-import { getPagination } from "../utils/pagination.js";
+import { makeSlug } from "../utils/slugify.js";
+import * as uploadService from "./uploadService.js";
 
-// GET /products/:slug would never reach a product whose slug equals one of these.
-// Step 15 must refuse them when generating slugs.
-export const RESERVED_PRODUCT_SLUGS = ["featured", "new-arrivals", "brands"];
+const MAX_IMAGES = 6;
 
-const DEFAULT_HOME_LIMIT = 8;
-const RELATED_LIMIT = 8;
-const LIST_PROJECTION = { description: 0 }; // cards do not need the long text
-
-// _id is the tie-breaker: without it, equal values can repeat or vanish between pages
-const SORTS = {
-  newest: { createdAt: -1, _id: -1 },
-  price_asc: { finalPrice: 1, _id: 1 },
-  price_desc: { finalPrice: -1, _id: 1 },
-};
-
-/**
- * Turns the (already validated) query into a Mongo query description.
- * query.category must already be a category id (see resolveCategoryId).
- * Returns { filter, sort, projection }.
- */
-export const buildProductQuery = (query = {}) => {
-  const { category, brand, size, color, minPrice, maxPrice, search, sort } = query;
-
-  if (sort !== undefined && !Object.hasOwn(SORTS, sort)) {
-    throw new ApiError(400, `sort must be one of: ${Object.keys(SORTS).join(", ")}`);
-  }
-
-  const filter = { isActive: true };
-  if (category) filter.category = category;
-  if (brand?.length) filter.brand = { $in: brand };
-
-  // size and color must match the SAME variant, and that variant must be in stock
-  if (size?.length || color?.length) {
-    const variant = { stock: { $gt: 0 } };
-    if (size?.length) variant.size = { $in: size.map(normalizeSize) };
-    if (color?.length) variant.color = { $in: color.map(normalizeColor) };
-    filter.variants = { $elemMatch: variant };
-  }
-
-  // finalPrice = discountPrice ?? price, i.e. what the customer pays
-  if (minPrice !== undefined || maxPrice !== undefined) {
-    filter.finalPrice = {};
-    if (minPrice !== undefined) filter.finalPrice.$gte = minPrice;
-    if (maxPrice !== undefined) filter.finalPrice.$lte = maxPrice;
-  }
-
-  if (search) filter.$text = { $search: search };
-
-  // A search without an explicit sort is ordered by relevance
-  const byRelevance = Boolean(search) && sort === undefined;
-  return {
-    filter,
-    sort: byRelevance ? { score: { $meta: "textScore" }, _id: -1 } : SORTS[sort ?? "newest"],
-    projection: byRelevance ? { ...LIST_PROJECTION, score: { $meta: "textScore" } } : LIST_PROJECTION,
-  };
-};
-
-// "men" -> its id (ids pass through). null means "no such category".
-const resolveCategoryId = async (value) => {
-  if (/^[a-f0-9]{24}$/i.test(value)) return value;
-  const category = await Category.findOne({ name: value }).select("_id");
-  return category?._id ?? null;
-};
-
-export const getProducts = async (query = {}) => {
-  const { page, limit, skip } = getPagination(query);
-
-  let categoryId;
-  if (query.category) {
-    categoryId = await resolveCategoryId(query.category);
-    if (!categoryId) return { products: [], total: 0, pages: 0, page };
-  }
-
-  const { filter, sort, projection } = buildProductQuery({ ...query, category: categoryId });
-  const [products, total] = await Promise.all([
-    Product.find(filter, projection).sort(sort).skip(skip).limit(limit),
-    Product.countDocuments(filter),
-  ]);
-
-  return { products, total, pages: Math.ceil(total / limit), page };
-};
-
-/** Public: inactive products are treated as not found. */
-export const getProductBySlug = async (slug) => {
-  const product = await Product.findOne({ slug, isActive: true }).populate("category", "name slug");
+const getByIdOrThrow = async (id) => {
+  const product = await Product.findById(id);
   if (!product) throw new ApiError(404, "Product not found");
   return product;
 };
 
-export const getRelatedProducts = async (slug) => {
-  const product = await Product.findOne({ slug, isActive: true }).select("category");
-  if (!product) throw new ApiError(404, "Product not found");
-
-  return Product.find(
-    { category: product.category, isActive: true, _id: { $ne: product._id } },
-    LIST_PROJECTION
-  )
-    .sort(SORTS.newest)
-    .limit(RELATED_LIMIT);
+const assertCategoryExists = async (categoryId) => {
+  const exists = await Category.exists({ _id: categoryId });
+  if (!exists) throw new ApiError(400, "Category not found");
 };
 
-export const getFeaturedProducts = async (limit = DEFAULT_HOME_LIMIT) =>
-  Product.find({ isActive: true, isFeatured: true }, LIST_PROJECTION).sort(SORTS.newest).limit(limit);
+const assertDiscount = (price, discountPrice) => {
+  if (discountPrice != null && discountPrice >= price) {
+    throw new ApiError(400, "Discount price must be less than price");
+  }
+};
 
-export const getNewArrivals = async (limit = DEFAULT_HOME_LIMIT) =>
-  Product.find({ isActive: true }, LIST_PROJECTION).sort(SORTS.newest).limit(limit);
+const pickDefined = (obj) =>
+  Object.fromEntries(Object.entries(obj).filter(([, value]) => value !== undefined));
 
-export const getBrands = async () => {
-  const brands = await Product.distinct("brand", { isActive: true });
-  return brands.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+// Best-effort cleanup: a failed Cloudinary delete must never break the request
+const discardImages = async (publicIds) => {
+  const results = await Promise.allSettled(publicIds.map(uploadService.deleteImage));
+  results.forEach((r, i) => {
+    if (r.status === "rejected") {
+      console.error(`Failed to delete image ${publicIds[i]}:`, r.reason?.message);
+    }
+  });
+};
+
+export const createProduct = async (data, files = []) => {
+  if (files.length === 0) throw new ApiError(400, "At least one image is required");
+
+  const slug = makeSlug(data.title);
+  if (!slug) throw new ApiError(400, "Title must contain letters or numbers");
+  if (await Product.exists({ slug })) {
+    throw new ApiError(409, "A product with this title already exists");
+  }
+  await assertCategoryExists(data.category);
+
+  const images = await uploadService.uploadImages(files);
+  try {
+    const product = await Product.create({
+      ...data,
+      slug,
+      images,
+      discountPrice: data.discountPrice ?? undefined,
+      isActive: data.isActive ?? true,
+      isFeatured: data.isFeatured ?? false,
+    });
+    return await product.populate("category", "name slug");
+  } catch (error) {
+    await discardImages(images.map((img) => img.publicId));
+    throw error;
+  }
+};
+
+export const updateProduct = async (id, data, files = []) => {
+  const product = await getByIdOrThrow(id);
+  const { removedImages = [], ...rawFields } = data;
+  const fields = pickDefined(rawFields);
+
+  const removeIds = new Set(removedImages);
+  const toRemove = product.images.filter((img) => removeIds.has(img.publicId));
+  if (toRemove.length !== removeIds.size) {
+    throw new ApiError(400, "Some images to remove do not belong to this product");
+  }
+
+  const kept = product.images.filter((img) => !removeIds.has(img.publicId));
+  const finalCount = kept.length + files.length;
+  if (finalCount < 1) throw new ApiError(400, "A product needs at least one image");
+  if (finalCount > MAX_IMAGES) {
+    throw new ApiError(400, `A product can have at most ${MAX_IMAGES} images`);
+  }
+
+  if (fields.category) await assertCategoryExists(fields.category);
+  const nextDiscount =
+    fields.discountPrice === undefined ? product.discountPrice : fields.discountPrice;
+  assertDiscount(fields.price ?? product.price, nextDiscount);
+
+  // Slug is intentionally kept stable on title change to protect existing URLs (SEO)
+  const newImages = files.length ? await uploadService.uploadImages(files) : [];
+  try {
+    product.set(fields);
+    product.images = [...kept, ...newImages];
+    await product.save();
+  } catch (error) {
+    await discardImages(newImages.map((img) => img.publicId));
+    throw error;
+  }
+
+  await discardImages(toRemove.map((img) => img.publicId));
+  return await product.populate("category", "name slug");
+};
+
+export const deleteProduct = async (id) => {
+  const product = await getByIdOrThrow(id);
+  await product.deleteOne();
+  // Old orders keep their own snapshot; only wishlists hold live references
+  await User.updateMany({ wishlist: product._id }, { $pull: { wishlist: product._id } });
+  await discardImages(product.images.map((img) => img.publicId));
+};
+
+export const toggleActive = async (id) => {
+  const product = await getByIdOrThrow(id);
+  product.isActive = !product.isActive;
+  await product.save();
+  return product;
 };

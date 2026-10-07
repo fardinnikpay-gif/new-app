@@ -1,52 +1,68 @@
 import { z } from "zod";
-import { CATEGORY_NAMES } from "../models/Category.js";
-import { optional } from "./authValidator.js";
 
-const OBJECT_ID = /^[a-f0-9]{24}$/i;
-export const SORT_OPTIONS = ["newest", "price_asc", "price_desc"];
+// multipart/form-data sends everything as strings, so JSON and booleans need manual parsing
+const parseJson = (value) => {
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value; // let Zod report the type error
+  }
+};
 
-// ?size=M,L  or  ?size=M&size=L  ->  ["M", "L"]
-const stringList = z
-  .union([z.string(), z.array(z.string()).max(20)])
-  .transform((value) =>
-    (Array.isArray(value) ? value : [value])
-      .flatMap((item) => item.split(","))
-      .map((item) => item.trim())
-      .filter(Boolean)
-  )
-  .pipe(z.array(z.string().max(60)).max(20));
+const toBoolean = (value) => {
+  if (value === "true") return true;
+  if (value === "false") return false;
+  return value;
+};
 
-const price = optional(z.coerce.number().min(0).max(10_000_000));
+const emptyToNull = (value) => (value === "" || value === "null" ? null : value);
 
-export const productQuerySchema = z
-  .object({
-    page: optional(z.coerce.number().int().min(1)),
-    limit: optional(z.coerce.number().int().min(1)),
-    category: optional(
-      z
-        .string()
-        .refine((value) => CATEGORY_NAMES.includes(value) || OBJECT_ID.test(value), {
-          message: `category must be one of ${CATEGORY_NAMES.join(", ")} or a category id`,
-        })
-    ),
-    brand: optional(stringList),
-    size: optional(stringList),
-    color: optional(stringList),
-    minPrice: price,
-    maxPrice: price,
-    sort: optional(z.enum(SORT_OPTIONS, { message: `sort must be one of: ${SORT_OPTIONS.join(", ")}` })),
-    search: optional(z.string().trim().min(1).max(100)),
+const hasUniqueVariants = (variants) =>
+  new Set(variants.map((v) => `${v.size}|${v.color}`)).size === variants.length;
+
+const variantSchema = z.object({
+  size: z.string().trim().min(1, "Size is required").max(20).transform((s) => s.toUpperCase()),
+  color: z.string().trim().min(1, "Color is required").max(30).transform((c) => c.toLowerCase()),
+  stock: z.coerce.number().int("Stock must be an integer").min(0, "Stock cannot be negative"),
+});
+
+const variantsSchema = z.preprocess(
+  parseJson,
+  z
+    .array(variantSchema)
+    .min(1, "At least one variant is required")
+    .refine(hasUniqueVariants, "Duplicate size/color combination")
+);
+
+const productShape = {
+  title: z.string().trim().min(2).max(120),
+  description: z.string().trim().min(10).max(2000),
+  brand: z.string().trim().min(1).max(60),
+  category: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid category id"),
+  price: z.coerce.number().positive("Price must be greater than 0"),
+  discountPrice: z.preprocess(emptyToNull, z.coerce.number().positive().nullable()).optional(),
+  variants: variantsSchema,
+  isActive: z.preprocess(toBoolean, z.boolean()).optional(),
+  isFeatured: z.preprocess(toBoolean, z.boolean()).optional(),
+};
+
+const discountBelowPrice = (data) =>
+  data.discountPrice == null || data.price == null || data.discountPrice < data.price;
+
+const discountRule = {
+  message: "Discount price must be less than price",
+  path: ["discountPrice"],
+};
+
+export const createProductSchema = z
+  .object(productShape)
+  .refine(discountBelowPrice, discountRule);
+
+export const updateProductSchema = z
+  .object(productShape)
+  .partial()
+  .extend({
+    removedImages: z.preprocess(parseJson, z.array(z.string().min(1))).optional(),
   })
-  .refine((q) => q.minPrice === undefined || q.maxPrice === undefined || q.minPrice <= q.maxPrice, {
-    message: "minPrice cannot be greater than maxPrice",
-    path: ["minPrice"],
-  });
-
-/** For /featured and /new-arrivals */
-export const homeListQuerySchema = z.object({
-  limit: optional(z.coerce.number().int().min(1).max(24)),
-});
-
-export const slugParamSchema = z.object({
-  slug: z.string().trim().toLowerCase().min(1).max(200),
-});
+  .refine(discountBelowPrice, discountRule);
