@@ -38,3 +38,12 @@ export const passwordResetLimiter = buildLimiter({
   limit: 10,
   message: "Too many password reset attempts, please try again in 15 minutes",
 });
+
+
+export const couponLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many coupon attempts, please try again later" },
+});
