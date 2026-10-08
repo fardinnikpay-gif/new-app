@@ -12,10 +12,12 @@ router.use(protect, adminOnly);
 
 router.get("/stats", adminController.getStats);
 
+router.get("/users", adminController.getUsers);
+router.get("/users/:id", adminController.getUserById);
+router.delete("/users/:id", adminController.deleteUser);
+
 router.get("/orders", adminOrderController.getAllOrders);
 router.patch("/orders/:id/status", validate(updateOrderStatusSchema), adminOrderController.updateOrderStatus);
 router.patch("/orders/:id/paid", adminOrderController.markAsPaid);
-
-// Step 23 adds: /users routes
 
 export default router;
