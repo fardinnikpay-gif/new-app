@@ -15,6 +15,7 @@ import wishlistRoutes from "./routes/wishlistRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import paymentRoutes, { webhookRouter } from "./routes/paymentRoutes.js";
 
 const app = express();
 
@@ -48,6 +49,8 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/payments/webhook", webhookRouter);
+app.use("/api/payments", paymentRoutes);
 // Routes will be mounted here in later steps
 
 app.use(notFound);

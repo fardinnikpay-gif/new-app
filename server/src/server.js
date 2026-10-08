@@ -1,7 +1,10 @@
 import app from "./app.js";
 import { config } from "./config/env.js";
 import { connectDB, disconnectDB } from "./config/db.js";
+import { startCleanupJob } from "./jobs/cleanupUnpaidOrders.js";
 
+// right after app.listen(...)
+startCleanupJob();
 let shuttingDown = false;
 
 const shutdown = (server, reason, exitCode = 0) => {
@@ -25,6 +28,8 @@ const start = async () => {
   const server = app.listen(config.port, () => {
     console.log(`Server running in ${config.env} mode on port ${config.port}`);
   });
+
+  startCleanupJob();
 
   server.on("error", (err) => {
     if (err.code === "EADDRINUSE") {

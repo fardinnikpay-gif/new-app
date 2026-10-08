@@ -68,3 +68,21 @@ export const createOrder = async ({ userId, items, shippingAddress, paymentMetho
   void sendConfirmationEmail(order, userId);
   return order;
 };
+
+// Shared by cancel (step 21), payment_failed and the cleanup job
+export const restoreStock = async (order) => {
+  await inventoryService.releaseStock(order.items);
+  if (order.couponCode) await couponService.releaseUse(order.couponCode);
+};
+
+// Whoever wins this atomic status change is the ONLY one allowed to restore stock, so double restore is impossible
+export const cancelPendingOrder = async (filter) => {
+  const order = await Order.findOneAndUpdate(
+    { ...filter, status: "pending", isPaid: false },
+    { $set: { status: "cancelled" } },
+    { new: true }
+  );
+  if (!order) return null;
+  await restoreStock(order);
+  return order;
+};
