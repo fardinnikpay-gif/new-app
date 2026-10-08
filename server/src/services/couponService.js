@@ -102,3 +102,28 @@ export const sendCouponByEmail = async (id, emails) => {
   }
   return { sent: recipients.length };
 };
+
+// Atomic check + increment in ONE query, so two simultaneous orders can never exceed maxUses
+export const claimUse = async (code) => {
+  const result = await Coupon.updateOne(
+    {
+      code,
+      isActive: true,
+      expiresAt: { $gt: new Date() },
+      $or: [{ maxUses: null }, { $expr: { $lt: ["$usedCount", "$maxUses"] } }], // maxUses null = unlimited
+    },
+    { $inc: { usedCount: 1 } }
+  );
+  if (result.modifiedCount !== 1) {
+    throw new ApiError(400, "Coupon is no longer available");
+  }
+};
+
+// Used for rollback only; never throws so it cannot hide the original error
+export const releaseUse = async (code) => {
+  try {
+    await Coupon.updateOne({ code, usedCount: { $gt: 0 } }, { $inc: { usedCount: -1 } });
+  } catch (error) {
+    console.error(`COUPON RELEASE FAILED code=${code}:`, error.message);
+  }
+};

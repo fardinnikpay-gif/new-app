@@ -47,3 +47,7 @@ export const couponLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: "Too many coupon attempts, please try again later" },
 });
+
+// Only limits requests that actually try a coupon code; shared by /cart/preview and POST /orders
+export const limitCouponAttempts = (req, res, next) =>
+  req.body?.couponCode ? couponLimiter(req, res, next) : next();
