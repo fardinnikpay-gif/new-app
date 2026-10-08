@@ -15,13 +15,7 @@
     "seed": "node scripts/seed.js",
     "seed:destroy": "node scripts/seed.js --destroy"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "transform": {},
-    "testMatch": [
-      "**/tests/**/*.test.js"
-    ]
-  },
+  
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -35,12 +35,23 @@ export const buildProductQuery = (query = {}) => {
   if (brand?.length) filter.brand = { $in: brand };
 
   // size and color must match the SAME variant, and that variant must be in stock
-  if (size?.length || color?.length) {
-    const variant = { stock: { $gt: 0 } };
-    if (size?.length) variant.size = { $in: size.map(normalizeSize) };
-    if (color?.length) variant.color = { $in: color.map(normalizeColor) };
-    filter.variants = { $elemMatch: variant };
+ if (size?.length || color?.length) {
+  const variant = { stock: { $gt: 0 } };
+
+  if (size?.length) {
+    variant.size = { $in: size.map(normalizeSize) };
   }
+
+  if (color?.length) {
+    variant.color = { $in: color.map(normalizeColor) };
+  }
+
+  filter.$or = [
+    { variants: { $exists: false } },
+    { variants: { $size: 0 } },
+    { variants: { $elemMatch: variant } },
+  ];
+}
 
   // finalPrice = discountPrice ?? price, i.e. what the customer pays
   if (minPrice !== undefined || maxPrice !== undefined) {

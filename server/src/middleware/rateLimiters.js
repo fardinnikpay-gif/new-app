@@ -45,6 +45,7 @@ export const couponLimiter = rateLimit({
   limit: 30,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => config.isTest,
   message: { success: false, message: "Too many coupon attempts, please try again later" },
 });
 

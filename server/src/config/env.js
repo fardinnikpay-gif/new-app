@@ -52,12 +52,29 @@ export const validateEnv = (env = process.env) => {
   const port = num("PORT", { fallback: 5000, min: 1, integer: true });
 
   // --- Database (tests must never touch the dev database) ---
-  const mongoUri = str(isTest ? "MONGO_URI_TEST" : "MONGO_URI");
+  // --- Database (tests must never touch the dev database) ---
+  const mongoUri = str("MONGO_URI");
+
   if (mongoUri && !/^mongodb(\+srv)?:\/\//.test(mongoUri)) {
-    invalid.push(`${isTest ? "MONGO_URI_TEST" : "MONGO_URI"} must start with mongodb:// or mongodb+srv://`);
+    invalid.push("MONGO_URI must start with mongodb:// or mongodb+srv://");
   }
-  if (isTest && mongoUri && mongoUri === (env.MONGO_URI ?? "").trim()) {
-    invalid.push("MONGO_URI_TEST must be different from MONGO_URI");
+
+  let mongoUriTest;
+
+  if (isTest) {
+    mongoUriTest = str("MONGO_URI_TEST");
+
+    if (mongoUriTest && !/^mongodb(\+srv)?:\/\//.test(mongoUriTest)) {
+      invalid.push("MONGO_URI_TEST must start with mongodb:// or mongodb+srv://");
+    }
+
+    if (mongoUri && mongoUriTest && mongoUri === mongoUriTest) {
+      invalid.push("MONGO_URI_TEST must be different from MONGO_URI");
+    }
+  }
+
+  if (mongoUri && !/^mongodb(\+srv)?:\/\//.test(mongoUri)) {
+    invalid.push("MONGO_URI must start with mongodb:// or mongodb+srv://");
   }
 
   // --- Auth ---
@@ -74,12 +91,17 @@ export const validateEnv = (env = process.env) => {
   const adminUrl = origin("ADMIN_URL");
 
   // --- Cloudinary ---
-  const cloudinary = {
-    cloudName: str("CLOUDINARY_CLOUD_NAME"),
-    apiKey: str("CLOUDINARY_API_KEY"),
-    apiSecret: str("CLOUDINARY_API_SECRET"),
-  };
+  // const cloudinary = {
+  //   cloudName: str("CLOUDINARY_CLOUD_NAME"),
+  //   apiKey: str("CLOUDINARY_API_KEY"),
+  //   apiSecret: str("CLOUDINARY_API_SECRET"),
+  // };
 
+  const cloudinary = {
+    cloudName: env.CLOUDINARY_CLOUD_NAME?.trim() || undefined,
+    apiKey: env.CLOUDINARY_API_KEY?.trim() || undefined,
+    apiSecret: env.CLOUDINARY_API_SECRET?.trim() || undefined,
+  };
   // --- SMTP ---
   const smtp = {
     host: str("SMTP_HOST"),
@@ -122,6 +144,7 @@ export const validateEnv = (env = process.env) => {
     isTest,
     port,
     mongoUri,
+    mongoUriTest,
     jwt: { secret: jwtSecret, expiresIn: jwtExpires },
     clientUrl,
     adminUrl,
@@ -140,12 +163,21 @@ export const validateEnv = (env = process.env) => {
   });
 };
 
+// const loadConfig = () => {
+//   try {
+//     return validateEnv();
+//   } catch (err) {
+//     console.error(`\n${err.message}\n`);
+//     process.exit(1);
+//   }
+// };
+
 const loadConfig = () => {
   try {
     return validateEnv();
   } catch (err) {
     console.error(`\n${err.message}\n`);
-    process.exit(1);
+    throw err;
   }
 };
 
