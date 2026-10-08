@@ -47,6 +47,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 // Routes will be mounted here in later steps
 
 app.use(notFound);
