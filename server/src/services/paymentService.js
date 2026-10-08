@@ -53,7 +53,7 @@ export const cancelPaymentIntent = async (intentId) => {
 };
 
 // Customer paid for an order we already cancelled: give the money back
-const refundPayment = async (intentId) => {
+export const refundPayment = async (intentId) => {
     try {
         await stripe.refunds.create(
             { payment_intent: intentId },

@@ -21,3 +21,7 @@ export const createOrderSchema = z.object({
   paymentMethod: z.enum(["cod", "stripe"]),
   couponCode: z.string().trim().max(30).optional(),
 });
+
+export const updateOrderStatusSchema = z.object({
+  status: z.enum(["pending", "processing", "shipped", "delivered", "cancelled"]),
+});

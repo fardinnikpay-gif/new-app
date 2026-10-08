@@ -11,6 +11,9 @@ router.use(protect);
 
 router.post("/", limitCouponAttempts, validate(createOrderSchema), orderController.createOrder);
 
-// Step 21 adds: GET /my (MUST be defined before /:id), GET /:id, PATCH /:id/cancel
+// "/my" MUST be defined before "/:id", otherwise "my" is read as an id
+router.get("/my", orderController.getMyOrders);
+router.get("/:id", orderController.getOrderById);
+router.patch("/:id/cancel", orderController.cancelOrder);
 
 export default router;
