@@ -17,6 +17,14 @@ import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes, { webhookRouter } from "./routes/paymentRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import { originGuard } from "./middleware/originGuard.js";
+import { setupSwagger } from "./docs/swagger.js";
+
+
+// 2) right after `const app = express();`
+// Render/Railway put one proxy in front of the app. Without this, rate limiting sees ONE ip for every user.
+if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
+
 
 const app = express();
 
@@ -25,6 +33,9 @@ if (config.isProduction) app.set("trust proxy", 1);
 
 // client and admin are two different origins; cookies need credentials: true
 app.use(cors({ origin: config.corsOrigins, credentials: true }));
+
+// 3) right after app.use(cors(...))
+app.use(originGuard);
 
 if (!config.isTest) app.use(morgan(config.isProduction ? "combined" : "dev"));
 
@@ -42,6 +53,9 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+
+// 4) with the routes, BEFORE notFound and errorHandler
+setupSwagger(app);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
