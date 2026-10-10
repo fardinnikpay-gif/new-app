@@ -1,97 +1,73 @@
 import { useState } from "react";
-import { BrowserRouter, Link } from "react-router-dom";
-import Badge from "./components/ui/Badge";
-import Breadcrumbs from "./components/ui/Breadcrumbs";
 import Button from "./components/ui/Button";
 import Container from "./components/ui/Container";
-import EmptyState from "./components/ui/EmptyState";
-import ErrorState from "./components/ui/ErrorState";
+import Drawer from "./components/ui/Drawer";
 import Input from "./components/ui/Input";
-import QuantityInput from "./components/ui/QuantityInput";
-import SectionHeading from "./components/ui/SectionHeading";
-import Select from "./components/ui/Select";
-import Skeleton from "./components/ui/Skeleton";
-import Spinner from "./components/ui/Spinner";
-
-const CRUMBS = [
-  { label: "Home", to: "/" },
-  { label: "Men", to: "/shop?category=men" },
-  { label: "T-shirts" },
-];
+import Modal from "./components/ui/Modal";
 
 export default function App() {
-  const [qty, setQty] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [hasError, setHasError] = useState(true);
+  const [modal, setModal] = useState(false);
+  const [fullModal, setFullModal] = useState(false);
+  const [drawer, setDrawer] = useState({ open: false, side: "right" });
+  const [nested, setNested] = useState(false);
 
-  const toggleLoading = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1500);
-  };
+  const openDrawer = (side) => setDrawer({ open: true, side });
+  const closeDrawer = () => setDrawer((prev) => ({ ...prev, open: false }));
 
   return (
-    <BrowserRouter>
-      <Container as="main" className="space-y-12 py-12">
-        <Breadcrumbs items={CRUMBS} />
-        <SectionHeading eyebrow="Step 3a" title="Base UI components" description="Temporary test page." />
+    <Container as="main" className="space-y-8 py-12">
+      <h1 className="text-4xl">Step 3b: Modal and Drawer</h1>
 
-        <section className="flex flex-wrap items-center gap-3">
-          <Button>Primary</Button>
-          <Button variant="outline">Outline</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Button size="sm">Small</Button>
-          <Button size="lg">Large</Button>
-          <Button loading={loading} onClick={toggleLoading}>
-            Click to load
-          </Button>
-          <Button disabled>Disabled</Button>
-          <Button as={Link} to="/shop" variant="outline">
-            As Link
-          </Button>
-        </section>
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={() => setModal(true)}>Open modal</Button>
+        <Button variant="outline" onClick={() => setFullModal(true)}>
+          Open full-screen modal
+        </Button>
+        <Button variant="outline" onClick={() => openDrawer("right")}>
+          Drawer (right)
+        </Button>
+        <Button variant="outline" onClick={() => openDrawer("left")}>
+          Drawer (left)
+        </Button>
+      </div>
 
-        <section className="flex flex-wrap items-center gap-4">
-          <Badge tone="sale">Sale</Badge>
-          <Badge tone="new">New</Badge>
-          <Badge>Neutral</Badge>
-          <Spinner size="sm" />
-          <Spinner />
-          <Spinner size="lg" />
-          <QuantityInput value={qty} onChange={setQty} max={3} />
-        </section>
+      <div className="grid h-[150vh] place-items-start rounded-lg border border-dashed border-line-strong p-6">
+        <p className="text-neutral-500">Tall area: open an overlay and try to scroll the page behind it.</p>
+      </div>
 
-        <section className="grid gap-4 md:grid-cols-2">
+      <Modal open={modal} onClose={() => setModal(false)} title="Edit details">
+        <div className="space-y-4">
+          <Input label="Name" placeholder="Focus lands here" data-autofocus />
           <Input label="Email" placeholder="you@example.com" />
-          <Input label="With error" defaultValue="oops" error="This field is invalid" />
-          <Select label="Size" defaultValue="m">
-            <option value="s">S</option>
-            <option value="m">M</option>
-            <option value="l">L</option>
-          </Select>
-          <Select label="Select with error" error="Please choose a size">
-            <option value="">Choose...</option>
-          </Select>
-        </section>
+          {Array.from({ length: 10 }, (_, i) => (
+            <p key={i} className="text-neutral-600">
+              Long content to test inner scrolling. Line {i + 1}: Lorem ipsum dolor sit amet, consectetur
+              adipiscing elit, sed do eiusmod tempor incididunt ut labore.
+            </p>
+          ))}
+          <div className="flex justify-end gap-3">
+            <Button variant="ghost" onClick={() => setModal(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => setModal(false)}>Save</Button>
+          </div>
+        </div>
+      </Modal>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          <Skeleton className="aspect-[4/5] w-full" />
-          <Skeleton className="h-6 w-2/3" />
-          <Skeleton className="h-6 w-1/2" />
-        </section>
+      <Modal open={fullModal} onClose={() => setFullModal(false)} title="Search" hideTitle size="full">
+        <Input label="Search products" placeholder="Type to search" data-autofocus />
+      </Modal>
 
-        <section className="grid gap-8 md:grid-cols-2">
-          <EmptyState
-            title="No products found"
-            description="Try a different filter."
-            action={<Button variant="outline">Clear filters</Button>}
-          />
-          {hasError ? (
-            <ErrorState message="Could not load products." onRetry={() => setHasError(false)} />
-          ) : (
-            <p className="self-center text-center text-neutral-500">Retry worked.</p>
-          )}
-        </section>
-      </Container>
-    </BrowserRouter>
+      <Drawer open={drawer.open} side={drawer.side} onClose={closeDrawer} title="Drawer">
+        <div className="space-y-4">
+          <p className="text-neutral-600">Press Esc, click outside, or use the close button.</p>
+          <Button onClick={() => setNested(true)}>Open nested modal</Button>
+        </div>
+      </Drawer>
+
+      <Modal open={nested} onClose={() => setNested(false)} title="Nested modal" size="sm">
+        <p className="text-neutral-600">Esc closes only this modal, not the drawer behind it.</p>
+      </Modal>
+    </Container>
   );
 }
