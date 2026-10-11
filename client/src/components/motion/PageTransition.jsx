@@ -4,29 +4,54 @@ import { ScrollTrigger } from "../../animations/gsap";
 import { DURATION } from "../../animations/variants";
 import { useLenis } from "./SmoothScroll";
 
-// props: { children } | children must be <Routes location={location}> so the leaving page keeps its old route.
-// Opacity only: a transform on this wrapper would break position: fixed and ScrollTrigger pins inside pages.
+// Routes inside these areas share one layout and should not
+// animate as separate pages.
+const SHARED_LAYOUT_PREFIXES = ["/account"];
+
+function getTransitionKey(pathname) {
+  const prefix = SHARED_LAYOUT_PREFIXES.find(
+    (item) => pathname === item || pathname.startsWith(`${item}/`)
+  );
+
+  return prefix ?? pathname;
+}
+
 export default function PageTransition({ children }) {
   const location = useLocation();
   const lenis = useLenis();
   const reduceMotion = useReducedMotion();
 
-  // Scroll to top only after the old page is fully hidden, so the user never sees a jump.
+  const transitionKey = getTransitionKey(location.pathname);
+
   const handleExitComplete = () => {
-    if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
-    else window.scrollTo(0, 0);
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true, force: true });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+
+    ScrollTrigger.refresh();
   };
 
-  const handleEntered = () => ScrollTrigger.refresh();
+  const handleEntered = () => {
+    ScrollTrigger.refresh();
+  };
 
   return (
-    <AnimatePresence mode="wait" initial={false} onExitComplete={handleExitComplete}>
+    <AnimatePresence
+      mode="wait"
+      initial={false}
+      onExitComplete={handleExitComplete}
+    >
       <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0 }}
+        key={transitionKey}
+        initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: reduceMotion ? 0 : DURATION.fast, ease: "easeOut" }}
+        transition={{
+          duration: reduceMotion ? 0 : DURATION.fast,
+          ease: "easeOut",
+        }}
         onAnimationComplete={handleEntered}
       >
         {children}
