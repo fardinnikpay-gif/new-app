@@ -17,12 +17,21 @@
 }
 
 @layer base {
-  :root {
+   :root {
     color-scheme: light;
+    --header-height: 4rem;
   }
 
+   @media (min-width: 768px) {
+    :root {
+      --header-height: 5rem;
+    }
+  }
+
+  
   html {
     -webkit-text-size-adjust: 100%;
+    scroll-padding-top: var(--header-height);
   }
 
   body {
@@ -75,3 +84,4 @@
     scroll-behavior: auto !important;
   }
 }
+

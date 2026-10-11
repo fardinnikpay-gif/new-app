@@ -11,3 +11,9 @@ export function getRedirectTarget(location) {
   }
   return DEFAULT_AFTER_LOGIN;
 }
+
+// shopUrl(params) | out: "/shop?category=men&sort=newest" (or "/shop" when params is empty)
+export function shopUrl(params = {}) {
+  const query = new URLSearchParams(params).toString();
+  return query ? `/shop?${query}` : "/shop";
+}

@@ -4,6 +4,8 @@ import PageSkeleton from "../components/common/PageSkeleton";
 import PageTransition from "../components/motion/PageTransition";
 import GuestRoute from "./GuestRoute";
 import ProtectedRoute from "./ProtectedRoute";
+// remove:  import PageTransition from "../components/motion/PageTransition";
+import Layout from "../components/layout/Layout";
 
 const Home = lazy(() => import("../pages/Home"));
 const Shop = lazy(() => import("../pages/Shop"));
