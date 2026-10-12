@@ -1,10 +1,15 @@
 import { useState } from "react";
+import { getProducts } from "../api/productApi";
 import ColorSwatch from "../components/product/ColorSwatch";
 import DiscountBadge from "../components/product/DiscountBadge";
 import PriceTag from "../components/product/PriceTag";
+import ProductGrid from "../components/product/ProductGrid";
 import SizeSelector from "../components/product/SizeSelector";
+import Button from "../components/ui/Button";
 import Container from "../components/ui/Container";
-import { getColors, getDiscountPercent, isColorAvailable } from "../utils/product";
+import ErrorState from "../components/ui/ErrorState";
+import useAsync from "../hooks/useAsync";
+import { getColors, isColorAvailable } from "../utils/product";
 
 // Deliberately unsorted sizes and one unknown color ("sunset") to test sorting and fallbacks
 const VARIANTS = [
@@ -20,6 +25,53 @@ const VARIANTS = [
   { size: "S", color: "red", stock: 0 },
 ];
 
+const makeVariants = (colors, sizes, stock = 5) =>
+  colors.flatMap((color) => sizes.map((size) => ({ size, color, stock })));
+
+const IMAGES = [{ url: "/placeholders/portrait.svg" }, { url: "/placeholders/square.svg" }];
+
+// Fake products for edge cases. Their ids are not in the database: the heart will fail and roll back.
+const FAKE_PRODUCTS = [
+  {
+    _id: "fake-sale",
+    slug: "fake-sale",
+    title: "Sale hoodie with a second image",
+    brand: "Northline",
+    price: 120,
+    discountPrice: 89,
+    images: IMAGES,
+    variants: makeVariants(["black", "navy"], ["S", "M", "L"]),
+  },
+  {
+    _id: "fake-sold-out",
+    slug: "fake-sold-out",
+    title: "Sold out jacket",
+    brand: "Northline",
+    price: 200,
+    discountPrice: 0,
+    images: [IMAGES[0]],
+    variants: makeVariants(["black"], ["M", "L"], 0),
+  },
+  {
+    _id: "fake-colors",
+    slug: "fake-colors",
+    title: "A very long product title that must be truncated on one line",
+    brand: "Atelier",
+    price: 59,
+    images: IMAGES,
+    variants: makeVariants(["black", "navy", "red", "beige", "olive", "pink", "sunset"], ["S", "M"]),
+  },
+  {
+    _id: "fake-no-image",
+    slug: "fake-no-image",
+    title: "No image, single option, stock 1",
+    price: 35,
+    discountPrice: 30,
+    images: [],
+    variants: makeVariants(["white"], ["M"], 1),
+  },
+];
+
 function Block({ title, children }) {
   return (
     <section className="space-y-3 rounded-lg border border-line p-4">
@@ -32,22 +84,15 @@ function Block({ title, children }) {
 export default function DevProducts() {
   const [color, setColor] = useState(null);
   const [size, setSize] = useState(null);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  const real = useAsync(({ signal }) => getProducts({ page: 1, limit: 8 }, { signal }), []);
   const colors = getColors(VARIANTS);
 
   return (
     <Container className="space-y-6 py-16">
       <h1 className="text-4xl">Product components (dev)</h1>
 
-      <Block title="ColorSwatch: static sizes">
-        <div className="flex items-center gap-3">
-          <ColorSwatch color="black" size="sm" />
-          <ColorSwatch color="navy" size="md" />
-          <ColorSwatch color="beige" size="lg" />
-          <ColorSwatch color="sunset" size="lg" />
-        </div>
-      </Block>
-
-      <Block title="ColorSwatch: selectable (red has no stock, sunset is an unknown color)">
+      <Block title="ColorSwatch + SizeSelector">
         <div role="group" aria-label="Color" className="flex flex-wrap">
           {colors.map((item) => (
             <ColorSwatch
@@ -62,33 +107,33 @@ export default function DevProducts() {
             />
           ))}
         </div>
-        <p className="text-sm text-neutral-500">selected color: {color ?? "none"}</p>
-      </Block>
-
-      <Block title="SizeSelector: follows the selected color above">
         <SizeSelector variants={VARIANTS} selectedColor={color} selectedSize={size} onSelect={setSize} />
-        <p className="text-sm text-neutral-500">selected size: {size ?? "none"}</p>
+        <p className="text-sm text-neutral-500">
+          color: {color ?? "none"} | size: {size ?? "none"}
+        </p>
       </Block>
 
-      <Block title="PriceTag">
-        <div className="flex flex-wrap items-baseline gap-8">
-          <PriceTag price={120} discountPrice={89} size="sm" />
-          <PriceTag price={120} discountPrice={89} />
+      <Block title="PriceTag and DiscountBadge">
+        <div className="flex flex-wrap items-center gap-6">
           <PriceTag price={120} discountPrice={89} size="lg" />
-          <PriceTag price={120} discountPrice={120} />
           <PriceTag price={120} discountPrice={0} />
-          <PriceTag price="abc" />
+          <DiscountBadge price={120} discountPrice={89} />
         </div>
       </Block>
 
-      <Block title="DiscountBadge">
-        <div className="flex flex-wrap items-center gap-4">
-          <DiscountBadge price={120} discountPrice={89} />
-          <DiscountBadge price={100} discountPrice={79} />
-          <DiscountBadge price={100} discountPrice={100} />
-          <DiscountBadge price={100} discountPrice={0} />
-          <span className="text-sm text-neutral-500">getDiscountPercent(120, 89) = {getDiscountPercent(120, 89)}</span>
-        </div>
+      <Block title="ProductCard edge cases (fake data)">
+        <ProductGrid products={FAKE_PRODUCTS} />
+      </Block>
+
+      <Block title="ProductGrid with real products from the API">
+        <Button size="sm" variant="outline" onClick={() => setShowSkeleton((value) => !value)}>
+          Toggle skeleton
+        </Button>
+        {real.error ? (
+          <ErrorState message={real.error.message} onRetry={real.reload} />
+        ) : (
+          <ProductGrid products={real.data?.products ?? []} loading={real.loading || showSkeleton} />
+        )}
       </Block>
     </Container>
   );
