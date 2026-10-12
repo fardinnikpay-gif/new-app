@@ -6,6 +6,7 @@ const LINKS = [
   "/",
   "/shop",
   "/product/test-slug",
+  "/dev/products",
   "/cart",
   "/checkout",
   "/login",

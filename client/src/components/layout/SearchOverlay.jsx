@@ -5,7 +5,7 @@ import { useUI } from "../../context/UIContext";
 import { NAV_CATEGORIES, SALE_LINK } from "../../data/navigation";
 import useLiveSearch, { MIN_QUERY_LENGTH } from "../../hooks/useLiveSearch";
 import { cx } from "../../utils/cx";
-import { formatPrice } from "../../utils/format";
+import PriceTag from "../product/PriceTag";
 import { shopUrl } from "../../utils/navigation";
 import Button from "../ui/Button";
 import EmptyState from "../ui/EmptyState";
@@ -21,22 +21,6 @@ const POPULAR_LINKS = [
   { label: SALE_LINK.label, to: SALE_LINK.to },
 ];
 
-function ResultPrice({ price, discountPrice }) {
-  const onSale = discountPrice > 0 && discountPrice < price;
-
-  return (
-    <span className="shrink-0 text-right text-sm">
-      {onSale ? (
-        <>
-          <span className="font-medium">{formatPrice(discountPrice)}</span>{" "}
-          <s className="text-neutral-400">{formatPrice(price)}</s>
-        </>
-      ) : (
-        formatPrice(price)
-      )}
-    </span>
-  );
-}
 
 // Mounted only while the modal is open, so the text and highlight reset on every open.
 function SearchPanel({ onClose }) {
@@ -220,7 +204,12 @@ function SearchPanel({ onClose }) {
                   <span className="block truncate font-medium">{product.title}</span>
                   {product.brand && <span className="block truncate text-sm text-neutral-500">{product.brand}</span>}
                 </span>
-                <ResultPrice price={product.price} discountPrice={product.discountPrice} />
+                <PriceTag
+                  price={product.price}
+                  discountPrice={product.discountPrice}
+                  size="sm"
+                  className="shrink-0 justify-end text-right"
+                />
               </Link>
             </li>
           ))}

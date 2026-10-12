@@ -31,6 +31,7 @@ const SizeGuide = lazy(() => import("../pages/SizeGuide"));
 const Terms = lazy(() => import("../pages/Terms"));
 const Privacy = lazy(() => import("../pages/Privacy"));
 const NotFound = lazy(() => import("../pages/NotFound"));
+const DevProducts = import.meta.env.DEV ? lazy(() => import("../pages/DevProducts")) : null;
 
 // <Routes location={location}> is required: the page that is fading out must keep rendering its old route.
 export default function AppRoutes() {
@@ -71,6 +72,7 @@ export default function AppRoutes() {
           <Route path="/size-guide" element={<SizeGuide />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          {DevProducts && <Route path="/dev/products" element={<DevProducts />} />}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
