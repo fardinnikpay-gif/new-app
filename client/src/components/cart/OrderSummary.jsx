@@ -13,7 +13,7 @@ function Row({ label, value, strong }) {
 }
 
 // children is the slot for the coupon input (reused by Checkout).
-export default function OrderSummary({ pricing, loading, ctaLabel, onCta, disabled, children }) {
+export default function OrderSummary({ pricing, loading, ctaLabel, onCta, disabled, ctaLoading, children }) {
   return (
     <aside aria-label="Order summary" className="rounded-lg border border-neutral-200 p-6">
       <h2 className="text-lg font-medium text-ink">Order summary</h2>
@@ -45,7 +45,7 @@ export default function OrderSummary({ pricing, loading, ctaLabel, onCta, disabl
       {children && <div className="mt-6">{children}</div>}
 
       {onCta && (
-        <Button size="lg" className="mt-6 w-full" onClick={onCta} disabled={disabled}>
+        <Button size="lg" className="mt-6 w-full" onClick={onCta} disabled={disabled} loading={ctaLoading}>
           {ctaLabel}
         </Button>
       )}

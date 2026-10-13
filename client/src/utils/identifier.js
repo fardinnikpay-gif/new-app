@@ -17,3 +17,6 @@ export const parseIdentifier = (value) => {
   if (!result) throw new Error("Enter a valid email or phone number");
   return result;
 };
+
+export const normalizePhone = (value) => String(value ?? "").trim().replace(PHONE_SEPARATORS, "");
+export const isValidPhone = (value) => PHONE_PATTERN.test(normalizePhone(value));

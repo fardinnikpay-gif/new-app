@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import { previewCart } from "../api/cartApi";
 import { useCart } from "../context/CartContext";
 import useCartPricing from "../hooks/useCartPricing";
-import useCouponCode from "../hooks/useCouponCode";
-import { findLine, toPreviewItems } from "../utils/cart";
+import useCoupon from "../hooks/useCoupon";
+import { findLine } from "../utils/cart";
 import Seo from "../components/common/Seo";
+import FormError from "../components/account/FormError";
 import CartIssueBanner from "../components/cart/CartIssueBanner";
 import CartItem from "../components/cart/CartItem";
 import CartSkeleton from "../components/cart/CartSkeleton";
@@ -31,10 +31,10 @@ function EmptyCart() {
 
 export default function Cart() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { items, isReady, totalCount, removeItem, updateQty } = useCart();
-  const [couponCode, setCouponCode] = useCouponCode();
-  const [couponError, setCouponError] = useState("");
-  const { pricing, loading, error, issues, reload } = useCartPricing(items, couponCode);
+  const coupon = useCoupon(items);
+  const { pricing, loading, error, issues, reload } = useCartPricing(items, coupon.couponCode);
 
   const issueByKey = useMemo(
     () => Object.fromEntries(issues.map((issue) => [issue.key, issue])),
@@ -42,30 +42,10 @@ export default function Cart() {
   );
 
   // an empty cart has nothing to discount
+  const { couponCode, setCouponCode } = coupon;
   useEffect(() => {
     if (isReady && items.length === 0 && couponCode) setCouponCode("");
   }, [isReady, items.length, couponCode, setCouponCode]);
-
-  // Validate the code with a one-off preview so the error message belongs to the code itself.
-  const handleApplyCoupon = useCallback(
-    async (code) => {
-      setCouponError("");
-      try {
-        await previewCart({ items: toPreviewItems(items), couponCode: code });
-        setCouponCode(code);
-        return true;
-      } catch (err) {
-        setCouponError(err.message || "This coupon code isn't valid");
-        return false;
-      }
-    },
-    [items, setCouponCode]
-  );
-
-  const handleRemoveCoupon = useCallback(() => {
-    setCouponCode("");
-    setCouponError("");
-  }, [setCouponCode]);
 
   // /checkout is a ProtectedRoute: guests are sent to /login and returned afterwards.
   const handleCheckout = () => navigate("/checkout");
@@ -83,6 +63,11 @@ export default function Cart() {
           Your cart <span className="text-neutral-400">({totalCount})</span>
         </Reveal>
 
+        {location.state?.checkoutError && (
+          <div className="mt-6">
+            <FormError message={location.state.checkoutError} />
+          </div>
+        )}
         <CartIssueBanner count={issues.length} />
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_24rem] lg:gap-16">
@@ -120,10 +105,10 @@ export default function Cart() {
                 disabled={!canCheckout}
               >
                 <CouponInput
-                  applied={couponCode}
-                  error={couponError}
-                  onApply={handleApplyCoupon}
-                  onRemove={handleRemoveCoupon}
+                  applied={coupon.couponCode}
+                  error={coupon.couponError}
+                  onApply={coupon.applyCoupon}
+                  onRemove={coupon.removeCoupon}
                 />
               </OrderSummary>
             )}
