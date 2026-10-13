@@ -5,9 +5,10 @@ import CouponInput from "./CouponInput";
 import OrderSummary from "./OrderSummary";
 
 // Items list + the same OrderSummary used in the cart (fresh prices from preview).
-// coupon: { applied, error, onApply, onRemove }
+// coupon: { applied, error, onApply, onRemove }. When `locked` (card payment in progress)
+// the coupon and the place-order button are hidden.
 export default function CheckoutSummary({
-  items, pricing, loading, placing, canPlace, onPlace, coupon, hint, error,
+  items, pricing, loading, placing, canPlace, onPlace, coupon, hint, error, locked,
 }) {
   return (
     <div className="space-y-4">
@@ -41,14 +42,18 @@ export default function CheckoutSummary({
         loading={loading}
         ctaLabel={placing ? "Placing order…" : "Place order"}
         ctaLoading={placing}
-        onCta={onPlace}
+        onCta={locked ? undefined : onPlace}
         disabled={!canPlace}
       >
-        <CouponInput {...coupon} />
-        {hint && <p className="mt-4 text-sm text-neutral-600">{hint}</p>}
-        <div className="mt-4 empty:hidden">
-          <FormError message={error} />
-        </div>
+        {locked ? null : (
+          <>
+            <CouponInput {...coupon} />
+            {hint && <p className="mt-4 text-sm text-neutral-600">{hint}</p>}
+            <div className="mt-4 empty:hidden">
+              <FormError message={error} />
+            </div>
+          </>
+        )}
       </OrderSummary>
     </div>
   );

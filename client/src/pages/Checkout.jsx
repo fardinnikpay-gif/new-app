@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { DEFAULT_PAYMENT_METHOD, isPaymentEnabled } from "../data/checkoutContent";
+import useCardPayment from "../hooks/useCardPayment";
 import useCartPricing from "../hooks/useCartPricing";
 import useCheckoutAddress from "../hooks/useCheckoutAddress";
 import useCoupon from "../hooks/useCoupon";
@@ -10,6 +11,7 @@ import Seo from "../components/common/Seo";
 import CartIssueBanner from "../components/cart/CartIssueBanner";
 import CartSkeleton from "../components/cart/CartSkeleton";
 import AddressSection from "../components/cart/AddressSection";
+import CardPaymentSection from "../components/cart/CardPaymentSection";
 import CheckoutSummary from "../components/cart/CheckoutSummary";
 import PaymentMethodSection from "../components/cart/PaymentMethodSection";
 import Reveal from "../components/motion/Reveal";
@@ -21,27 +23,40 @@ export default function Checkout() {
   const { items, isReady, clearCart } = useCart();
   const coupon = useCoupon(items);
   const address = useCheckoutAddress();
+  const card = useCardPayment();
   const [paymentMethod, setPaymentMethod] = useState(DEFAULT_PAYMENT_METHOD);
   const { pricing, loading, error, issues, reload } = useCartPricing(items, coupon.couponCode);
   const { placeOrder, placing, error: placeError, stockProblem } = usePlaceOrder();
   const orderPlacedRef = useRef(false);
+  const submitLockRef = useRef(false);
+
+  const paymentLocked = card.active; // the order exists and the card form is shown
+  const busy = placing || card.loading;
 
   // stock changed while ordering: back to the cart, where each item shows its own warning
   useEffect(() => {
     if (stockProblem) navigate("/cart", { replace: true, state: { checkoutError: placeError } });
   }, [stockProblem, placeError, navigate]);
 
-  const handlePlaceOrder = async () => {
-    const order = await placeOrder(address.shippingAddress, paymentMethod, coupon.couponCode);
-    if (!order) return;
+  // The cart is cleared only after the order is really done (COD placed / card paid).
+  const finishOrder = (orderId) => {
+    orderPlacedRef.current = true; // an empty cart after this point is expected
+    coupon.setCouponCode("");
+    clearCart();
+    navigate(`/checkout/success/${orderId}`, { replace: true });
+  };
 
-    if (paymentMethod === "cod") {
-      orderPlacedRef.current = true; // an empty cart after this point is expected
-      coupon.setCouponCode("");
-      clearCart();
-      navigate(`/checkout/success/${order._id}`, { replace: true });
+  const handlePlaceOrder = async () => {
+    if (submitLockRef.current) return;
+    submitLockRef.current = true;
+
+    const order = await placeOrder(address.shippingAddress, paymentMethod, coupon.couponCode);
+    if (!order) {
+      submitLockRef.current = false;
+      return;
     }
-    // card payments continue in step 18
+    if (paymentMethod === "cod") finishOrder(order._id);
+    else await card.start(order._id); // the lock stays on: the card form takes over from here
   };
 
   if (!isReady) return <CartSkeleton />;
@@ -56,10 +71,9 @@ export default function Checkout() {
     issues.length === 0 &&
     Boolean(address.shippingAddress) &&
     isPaymentEnabled(paymentMethod) &&
-    !placing;
+    !busy;
 
-  let hint = "";
-  if (!address.shippingAddress) hint = "Choose or add a shipping address to continue.";
+  const hint = address.shippingAddress ? "" : "Choose or add a shipping address to continue.";
 
   return (
     <>
@@ -69,20 +83,37 @@ export default function Checkout() {
           Checkout
         </Reveal>
 
-        <CartIssueBanner count={issues.length} />
-        {issues.length > 0 && (
-          <Link
-            to="/cart"
-            className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-ink underline-offset-4 hover:underline"
-          >
-            Review your cart
-          </Link>
+        {!paymentLocked && (
+          <>
+            <CartIssueBanner count={issues.length} />
+            {issues.length > 0 && (
+              <Link
+                to="/cart"
+                className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-ink underline-offset-4 hover:underline"
+              >
+                Review your cart
+              </Link>
+            )}
+          </>
         )}
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_26rem] lg:gap-16">
           <div className="space-y-12">
-            <AddressSection {...address} />
-            <PaymentMethodSection value={paymentMethod} onChange={setPaymentMethod} />
+            {paymentLocked ? (
+              <CardPaymentSection
+                orderId={card.orderId}
+                clientSecret={card.clientSecret}
+                loading={card.loading}
+                error={card.error}
+                onRetry={card.retry}
+                onSuccess={() => finishOrder(card.orderId)}
+              />
+            ) : (
+              <>
+                <AddressSection {...address} />
+                <PaymentMethodSection value={paymentMethod} onChange={setPaymentMethod} />
+              </>
+            )}
           </div>
 
           <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
@@ -92,9 +123,10 @@ export default function Checkout() {
                 items={items}
                 pricing={pricing}
                 loading={loading}
-                placing={placing}
+                placing={busy}
                 canPlace={canPlace}
                 onPlace={handlePlaceOrder}
+                locked={paymentLocked}
                 hint={hint}
                 error={placeError}
                 coupon={{

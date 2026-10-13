@@ -22,7 +22,7 @@ export default function PaymentMethodSection({ value, onChange }) {
           >
             <p className="font-medium text-ink">{method.label}</p>
             <p className="mt-1 text-sm text-neutral-600">
-              {method.enabled ? method.description : "Coming soon"}
+              {method.enabled ? method.description : "Currently unavailable"}
             </p>
           </SelectableCard>
         ))}
