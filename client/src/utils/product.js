@@ -45,3 +45,56 @@ export const isColorAvailable = (variants = [], color, size = null) =>
 
 // isInStock(product) | out: true when at least one variant has stock
 export const isInStock = (product) => product.variants?.some((variant) => variant.stock > 0) ?? false;
+
+const ISO_CURRENCY = /^[A-Z]{3}$/;
+const SEO_DESCRIPTION_MAX = 160;
+
+export const getEffectivePrice = (product) =>
+  product.discountPrice != null && product.discountPrice < product.price
+    ? product.discountPrice
+    : product.price;
+
+export const hasDiscount = (product) =>
+  product.discountPrice != null && product.discountPrice < product.price;
+
+export const getProductCategory = (product) => {
+  const category = product.category;
+  const value = typeof category === "string" ? category : category?.slug ?? category?.name ?? "";
+  return String(value).toLowerCase();
+};
+
+const truncate = (text, max) =>
+  text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`;
+
+export const getProductDescription = (product) => {
+  const base =
+    (product.description || "").replace(/\s+/g, " ").trim() ||
+    `${product.brand ?? ""} ${product.title}`.trim();
+  return truncate(base, SEO_DESCRIPTION_MAX);
+};
+
+// schema.org Product. priceCurrency is only added when VITE_CURRENCY is an ISO code (e.g. USD).
+export const buildProductJsonLd = (product) => {
+  const currency = import.meta.env.VITE_CURRENCY ?? "";
+  const siteUrl = (import.meta.env.VITE_SITE_URL ?? "").replace(/\/$/, "");
+  const images = (product.images ?? []).map((image) => image.url).filter(Boolean);
+
+  const offer = {
+    "@type": "Offer",
+    price: getEffectivePrice(product),
+    availability:
+      product.totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+  };
+  if (ISO_CURRENCY.test(currency)) offer.priceCurrency = currency;
+  if (siteUrl) offer.url = `${siteUrl}/product/${product.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    ...(images.length > 0 && { image: images }),
+    description: getProductDescription(product),
+    ...(product.brand && { brand: { "@type": "Brand", name: product.brand } }),
+    offers: offer,
+  };
+};
