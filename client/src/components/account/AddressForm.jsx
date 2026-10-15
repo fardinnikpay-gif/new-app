@@ -4,7 +4,10 @@ import { addressSchema } from "../../utils/validators";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 
-const EMPTY = { fullName: "", phone: "", city: "", street: "", postalCode: "", saveToAccount: false };
+const EMPTY = {
+  fullName: "", phone: "", city: "", street: "", postalCode: "",
+  saveToAccount: false, isDefault: false,
+};
 
 // Reusable address form (checkout now, account addresses in step 20).
 export default function AddressForm({
@@ -13,6 +16,7 @@ export default function AddressForm({
   onCancel,
   submitLabel = "Save address",
   showSaveOption = false,
+  showDefaultOption = false,
   submitting = false,
 }) {
   const {
@@ -67,6 +71,12 @@ export default function AddressForm({
         <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-ink">
           <input type="checkbox" className="h-5 w-5 accent-primary" {...register("saveToAccount")} />
           Save this address to my account
+        </label>
+      )}
+      {showDefaultOption && (
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-ink">
+          <input type="checkbox" className="h-5 w-5 accent-primary" {...register("isDefault")} />
+          Set as my default address
         </label>
       )}
 

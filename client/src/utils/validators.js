@@ -54,5 +54,6 @@ export const addressSchema = z.object({
   city: z.string().trim().min(2, "Enter your city"),
   street: z.string().trim().min(5, "Enter your street address"),
   postalCode: z.string().trim().regex(POSTAL_CODE_PATTERN, "Enter a valid postal code"),
-  saveToAccount: z.boolean().optional(),
+  saveToAccount: z.boolean().optional(), isDefault: z.boolean().optional(),
+  
 });

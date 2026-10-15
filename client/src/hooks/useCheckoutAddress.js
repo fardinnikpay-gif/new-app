@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { addAddress } from "../api/userApi";
 import { useAuth } from "../context/AuthContext";
 import { MAX_SAVED_ADDRESSES, NEW_ADDRESS_ID } from "../data/checkoutContent";
-import { sameAddress, toShippingAddress } from "../utils/address";
+import { sameAddress, toShippingAddress } from "../data/address";
 import { normalizePhone } from "../utils/identifier";
 
 const getDefaultId = (saved) => (saved.find((a) => a.isDefault) ?? saved[0])?._id ?? null;
