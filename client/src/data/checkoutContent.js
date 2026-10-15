@@ -20,3 +20,6 @@ export const paymentMethods = [
 
 export const isPaymentEnabled = (value) =>
   paymentMethods.some((method) => method.value === value && method.enabled);
+export const isStripeConfigured = Boolean(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.trim()
+);

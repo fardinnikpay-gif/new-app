@@ -1,3 +1,14 @@
+﻿import { z } from "zod";
+import { isValidPhone } from "../utils/identifier";
+
+const MIN_PASSWORD_LENGTH = 8;
+
+const newPassword = z
+  .string()
+  .min(MIN_PASSWORD_LENGTH, `Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+
+const confirmPassword = z.string().min(1, "Confirm your password");
+
 // Phone is required when the account has no email (it's the only way to log in).
 export const makeProfileSchema = (requirePhone) =>
   z.object({
