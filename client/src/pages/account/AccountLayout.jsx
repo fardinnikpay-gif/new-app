@@ -6,8 +6,9 @@ import ProtectedRoute from "../../routes/ProtectedRoute";
 import AccountNav from "../../components/account/AccountNav";
 import Reveal from "../../components/motion/Reveal";
 import Container from "../../components/ui/Container";
+import { transitions } from "../../utils/motion";
 
-const PAGE_TRANSITION = { duration: 0.25 };
+const PAGE_TRANSITION = transitions.base
 
 function AccountShell() {
   const { user, logout } = useAuth();

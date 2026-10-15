@@ -4,9 +4,10 @@ import { ArrowUpRight } from "lucide-react";
 import { CATEGORY_IMAGE_SIZE } from "../../data/homeContent";
 import { cx } from "../../utils/cx";
 import { getCategoryImage, getCategoryKey, getCategoryLabel } from "../../utils/categories";
+import { transitions } from "../../utils/motion";
 
 const HOVER_SCALE = 1.05;
-const HOVER_TRANSITION = { duration: 0.6, ease: [0.22, 1, 0.36, 1] };
+const HOVER_TRANSITION = transitions.slow;
 
 // data-cat-* attributes are the hooks for useCategoryShowcaseScroll.
 // Overlays are pointer-events-none so Framer's hover reaches the image layer.

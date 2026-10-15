@@ -2,12 +2,13 @@ import { useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { careContent, productTabs, shippingContent } from "../../data/productContent";
 import { cx } from "../../utils/cx";
+import { transitions } from "../../utils/motion";
 
 const PANEL_MOTION = {
   initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0 },
-  transition: { duration: 0.2 },
+  transition: transitions.fast,
 };
 
 function InfoList({ items }) {

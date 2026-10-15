@@ -6,9 +6,10 @@ import { formatPrice } from "../../utils/format";
 import { getItemImage, getLineAmounts, getMaxQty } from "../../utils/cart";
 import Button from "../ui/Button";
 import QuantityInput from "../ui/QuantityInput";
+import { transitions } from "../../utils/motion";
 
 const EXIT = { opacity: 0, x: -24 };
-const TRANSITION = { duration: 0.25 };
+const TRANSITION = transitions.base
 
 export default function CartItem({ item, line, issue, onQty, onRemove }) {
   const { unit, total } = getLineAmounts(line, item);

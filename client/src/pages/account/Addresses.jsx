@@ -94,10 +94,11 @@ export default function Addresses() {
         ) : (
           <>
             <ul className="grid gap-4 md:grid-cols-2">
-              {sorted.map((address) => (
+              {sorted.map((address, index) => (
                 <AddressCard
                   key={address._id}
                   address={address}
+                  index={index}
                   disabled={deleting}
                   onEdit={openForm}
                   onDelete={setToDelete}

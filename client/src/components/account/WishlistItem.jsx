@@ -1,20 +1,22 @@
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
+import { staggerDelay, transitions } from "../../utils/motion";
 import ProductCard from "../product/ProductCard";
 
 const EXIT = { opacity: 0, scale: 0.95 };
-const MOTION = { duration: 0.3 };
 
 // A wishlist grid cell: the product card plus an explicit remove button.
 // Must be a direct child of AnimatePresence so the exit animation runs.
-export default function WishlistItem({ product, onRemove, reduceMotion }) {
+// The stagger delay lives inside `animate`, so it only applies to the entrance
+// (not to layout reflow or exit).
+export default function WishlistItem({ product, onRemove, reduceMotion, index = 0 }) {
   return (
     <motion.li
       layout={!reduceMotion}
       initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0, transition: { ...transitions.base, delay: staggerDelay(index) } }}
       exit={reduceMotion ? { opacity: 0 } : EXIT}
-      transition={MOTION}
+      transition={transitions.base}
     >
       <ProductCard product={product} />
       <button

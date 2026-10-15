@@ -1,17 +1,18 @@
-import { AnimatePresence, motion } from "framer-motion";
+﻿import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { getColorHex } from "../../utils/colors";
 import { formatPrice } from "../../utils/format";
+import { transitions } from "../../utils/motion";
 
 const CHIP_MOTION = {
   initial: { opacity: 0, scale: 0.9 },
   animate: { opacity: 1, scale: 1 },
   exit: { opacity: 0, scale: 0.9 },
-  transition: { duration: 0.2 },
+  transition: transitions.fast,
 };
 
 const priceLabel = (min, max) => {
-  if (min && max) return `${formatPrice(Number(min))} – ${formatPrice(Number(max))}`;
+  if (min && max) return `${formatPrice(Number(min))} â€“ ${formatPrice(Number(max))}`;
   if (min) return `From ${formatPrice(Number(min))}`;
   return `Up to ${formatPrice(Number(max))}`;
 };
@@ -19,7 +20,7 @@ const priceLabel = (min, max) => {
 // Each chip carries the patch that removes it.
 const buildChips = (filters) => {
   const chips = [];
-  if (filters.search) chips.push({ id: "search", label: `“${filters.search}”`, patch: { search: "" } });
+  if (filters.search) chips.push({ id: "search", label: `â€œ${filters.search}â€`, patch: { search: "" } });
   if (filters.category) chips.push({ id: "category", label: filters.category, patch: { category: "" } });
   if (filters.brand) chips.push({ id: "brand", label: filters.brand, patch: { brand: "" } });
   if (filters.size) chips.push({ id: "size", label: `Size ${filters.size}`, patch: { size: "" } });

@@ -17,7 +17,9 @@ export default function Layout({ children }) {
       </a>
       <Header />
       <main id="main-content" tabIndex={-1} className="flex-1 pt-[var(--header-height)] outline-none">
-        <PageTransition>{children}</PageTransition>
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
       <BackToTop />

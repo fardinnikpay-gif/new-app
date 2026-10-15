@@ -5,10 +5,13 @@ import FormError from "../account/FormError";
 import Button from "../ui/Button";
 import Skeleton from "../ui/Skeleton";
 import StripePaymentForm from "./StripePaymentForm";
+import { lazy, Suspense, useId } from "react";
 
 // Shown instead of the address/payment sections once the order exists.
 export default function CardPaymentSection({ orderId, clientSecret, loading, error, onRetry, onSuccess }) {
   const headingId = useId();
+
+  const StripePaymentForm = lazy(() => import("./StripePaymentForm"));
 
   return (
     <section aria-labelledby={headingId}>
@@ -35,7 +38,9 @@ export default function CardPaymentSection({ orderId, clientSecret, loading, err
         )}
 
         {clientSecret && (
-          <StripePaymentForm clientSecret={clientSecret} orderId={orderId} onSuccess={onSuccess} />
+          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+            <StripePaymentForm clientSecret={clientSecret} orderId={orderId} onSuccess={onSuccess} />
+          </Suspense>
         )}
       </div>
     </section>

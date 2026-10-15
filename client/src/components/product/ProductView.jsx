@@ -11,9 +11,11 @@ import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
 import ProductTabs from "./ProductTabs";
 import RelatedProducts from "./RelatedProducts";
+import useScrollShift from "../../hooks/useScrollShift";
 
 const TABLET_UP_QUERY = "(min-width: 768px)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+const GALLERY_SHIFT = { y: 40 };
 
 // Rendered with key={product._id}, so selection state resets per product.
 export default function ProductView({ product }) {
@@ -24,6 +26,10 @@ export default function ProductView({ product }) {
   const reducedMotion = useMediaQuery(REDUCED_MOTION_QUERY);
   const showBar = useStickyBar(ctaRef, endRef, isPhone);
   const category = getProductCategory(product);
+
+
+  const galleryRef = useRef(null);
+  useScrollShift(galleryRef, GALLERY_SHIFT);
 
   const handleBarAdd = () => {
     const result = selection.addToCart();
@@ -57,8 +63,13 @@ export default function ProductView({ product }) {
       <Container className="pb-24 pt-6 md:pb-16 md:pt-10">
         <Breadcrumbs items={crumbs} />
         <div className="mt-6 grid gap-8 md:gap-10 lg:grid-cols-2 lg:gap-16">
-          <ProductGallery images={product.images} title={product.title} />
-          <ProductInfo product={product} selection={selection} ctaRef={ctaRef} />
+          <div ref={galleryRef}>
+            <ProductGallery images={product.images} title={product.title} />
+          </div>
+          {/* sticky instead of a GSAP pin: same look, no pin-spacer, no JS */}
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <ProductInfo product={product} selection={selection} ctaRef={ctaRef} />
+          </div>
         </div>
         <ProductTabs product={product} />
         <div ref={endRef} aria-hidden="true" />

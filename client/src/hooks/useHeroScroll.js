@@ -25,7 +25,11 @@ export default function useHeroScroll({ sectionRef, innerRef }, resetKey) {
 
     mm.add({ isDesktop: DESKTOP_MOTION, isTablet: TABLET_MOTION }, (context) => {
       const { isDesktop } = context.conditions;
-      const parallaxTargets = section.querySelectorAll("[data-hero-parallax]");
+      const parallaxTargets = [...section.querySelectorAll("[data-hero-parallax]")];
+
+      // will-change only while the trigger is active, so no layers are kept around needlessly
+      const hinted = [inner, ...parallaxTargets];
+      const setHint = (value) => hinted.forEach((el) => (el.style.willChange = value));
 
       gsap
         .timeline({
@@ -39,6 +43,7 @@ export default function useHeroScroll({ sectionRef, innerRef }, resetKey) {
             pinSpacing: false,
             anticipatePin: 1,
             invalidateOnRefresh: true,
+            onToggle: (self) => setHint(self.isActive ? "transform, opacity" : "auto"),
           },
         })
         .to(inner, { scale: END_SCALE, opacity: END_OPACITY }, 0)
@@ -48,6 +53,8 @@ export default function useHeroScroll({ sectionRef, innerRef }, resetKey) {
           { yPercent: PARALLAX_SHIFT, scale: PARALLAX_SCALE },
           0
         );
+
+      return () => setHint("");
     });
 
     return () => mm.revert(); // kills ScrollTriggers and restores inline styles

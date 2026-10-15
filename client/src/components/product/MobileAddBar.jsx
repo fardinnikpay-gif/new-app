@@ -1,12 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import AddToCartButton from "./AddToCartButton";
 import PriceTag from "./PriceTag";
+import { transitions } from "../../utils/motion";
 
 const SLIDE = {
   initial: { y: "100%" },
   animate: { y: 0 },
   exit: { y: "100%" },
-  transition: { duration: 0.25 },
+  transition:transitions.base,
 };
 
 // Fixed bottom bar on phones. `visible` comes from useStickyBar.

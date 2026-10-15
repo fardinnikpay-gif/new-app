@@ -2,12 +2,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ShoppingBag } from "lucide-react";
 import { cx } from "../../utils/cx";
 import Button from "../ui/Button";
+import { transitions } from "../../utils/motion";
 
 const SWAP = {
   initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -8 },
-  transition: { duration: 0.2 },
+  transition: transitions.fast,
 };
 
 export default function AddToCartButton({ status, soldOut, onClick, size = "lg", className }) {

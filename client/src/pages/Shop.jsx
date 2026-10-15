@@ -22,10 +22,12 @@ import Button from "../components/ui/Button";
 import Container from "../components/ui/Container";
 import EmptyState from "../components/ui/EmptyState";
 import ErrorState from "../components/ui/ErrorState";
+import useScrollShift from "../hooks/useScrollShift";
 
 const DESKTOP_QUERY = "(min-width: 1024px)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const SCROLL_OFFSET_PX = 96; // header height + breathing room
+const TITLE_SHIFT = { y: 24, opacity: 0.4, end: "+=300" };
 
 // Used when GET /categories fails, so the sidebar still works.
 const FALLBACK_CATEGORIES = CATEGORY_ORDER.map((key) => ({ slug: key, name: key }));
@@ -67,6 +69,9 @@ export default function Shop() {
   const categories = loadedCategories.length ? loadedCategories : FALLBACK_CATEGORIES;
 
   const title = getShopTitle(filters);
+
+  const titleRef = useRef(null);
+  useScrollShift(titleRef, TITLE_SHIFT);
 
   // Scroll back to the top of the grid when filters/page change (only if it's out of view).
   useEffect(() => {
@@ -128,6 +133,12 @@ export default function Shop() {
         <Reveal key={title} as="h1" className="mb-8 text-4xl font-light tracking-tight text-ink md:text-5xl">
           {title}
         </Reveal>
+
+        <div ref={titleRef}>
+          <Reveal key={title} as="h1" className="mb-8 text-4xl font-light tracking-tight text-ink md:text-5xl">
+            {title}
+          </Reveal>
+        </div>
 
         <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-4">
           <div className="flex items-center gap-4">

@@ -106,10 +106,11 @@ export default function Wishlist() {
         </div>
         <ul className={GRID}>
           <AnimatePresence mode="popLayout">
-            {items.map((product) => (
+            {items.map((product,index) => (
               <WishlistItem
                 key={product._id}
                 product={product}
+                index={index}
                 onRemove={handleRemove}
                 reduceMotion={reduceMotion}
               />
