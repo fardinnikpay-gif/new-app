@@ -57,3 +57,14 @@ export const addressSchema = z.object({
   saveToAccount: z.boolean().optional(), isDefault: z.boolean().optional(),
   
 });
+
+export const contactSchema = z.object({
+  name: z.string().trim().min(2, "Enter your name").max(60, "Name is too long"),
+  email: z.string().trim().min(1, "Enter your email").email("Enter a valid email"),
+  subject: z.string().trim().min(3, "Enter a subject").max(100, "Subject is too long"),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Your message is too short")
+    .max(1500, "Please keep your message under 1500 characters"),
+});

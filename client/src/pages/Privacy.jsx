@@ -1,5 +1,8 @@
-import PagePlaceholder from "../components/common/PagePlaceholder";
+import { privacy } from "../data/policies";
+import PolicyPage from "../components/common/PolicyPage";
 
 export default function Privacy() {
-  return <PagePlaceholder title="Privacy" />;
+  return (
+    <PolicyPage policy={privacy} seoDescription="How we collect, use and protect your personal information." />
+  );
 }
