@@ -116,7 +116,7 @@ export default function Checkout() {
             )}
           </div>
 
-          <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <div className="space-y-4 lg:self-start lg:[@media(min-height:820px)]:sticky lg:[@media(min-height:820px)]:top-24 ">
             {error && <ErrorState message={error.message} onRetry={reload} />}
             {(pricing || !error) && (
               <CheckoutSummary

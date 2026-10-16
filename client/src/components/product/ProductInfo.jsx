@@ -22,7 +22,7 @@ function StockNote({ selection }) {
 
   if (!text) return null;
   return (
-    <p role="status" className={cx("mt-4 text-sm", lowStock ? "text-primary" : "text-neutral-600")}>
+    <p role="status" className={cx("mt-4 text-sm", lowStock ? "text-primary-strong" : "text-neutral-600")}>
       {text}
     </p>
   );
@@ -41,7 +41,7 @@ export default function ProductInfo({ product, selection, ctaRef }) {
       {product.brand && (
         <Link
           to={`/shop?brand=${encodeURIComponent(product.brand)}`}
-          className="text-sm uppercase tracking-widest text-primary hover:underline"
+          className="text-sm uppercase tracking-widest text-primary-strong hover:underline"
         >
           {product.brand}
         </Link>
@@ -97,6 +97,10 @@ export default function ProductInfo({ product, selection, ctaRef }) {
       </section>
 
       <StockNote selection={selection} />
+
+      <p role="status" className="sr-only">
+        {status === "success" ? "Added to cart" : ""}
+      </p>
 
       <div className="mt-6">
         <QuantityInput

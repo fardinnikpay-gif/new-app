@@ -22,7 +22,7 @@ export default function PromoBanner() {
             decoding="async"
             className="aspect-4/5 w-full object-cover md:aspect-21/9"
           />
-          <div aria-hidden="true" className="absolute inset-0 bg-ink/40" />
+          <div aria-hidden="true" className="absolute inset-0 bg-ink/50" />
 
           <div className="absolute inset-0 flex items-center p-6 md:p-16">
             <div className="max-w-xl text-white">
@@ -32,7 +32,7 @@ export default function PromoBanner() {
               <Reveal as="h2" delay={DELAY_S.title} className="text-3xl font-light tracking-tight md:text-5xl">
                 {title}
               </Reveal>
-              <Reveal as="p" delay={DELAY_S.subtitle} className="mt-4 text-white/80">
+              <Reveal as="p" delay={DELAY_S.subtitle} className="mt-4 text-white/90">
                 {subtitle}
               </Reveal>
               <Reveal delay={DELAY_S.cta} className="mt-8">

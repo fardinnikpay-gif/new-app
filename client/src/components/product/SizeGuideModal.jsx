@@ -10,7 +10,7 @@ export default function SizeGuideModal({ open, onClose }) {
         <Link
           to="/size-guide"
           onClick={onClose}
-          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary-strong underline-offset-4 hover:underline"
         >
           How to measure →
         </Link>

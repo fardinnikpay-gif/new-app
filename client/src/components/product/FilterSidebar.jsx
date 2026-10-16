@@ -57,7 +57,7 @@ export default function FilterSidebar({ filters, onChange, brands = [], categori
                   "flex h-11 items-center justify-center rounded-md border text-sm transition-colors",
                   selected
                     ? "border-ink bg-ink text-white"
-                    : "border-neutral-300 text-ink hover:border-ink"
+                    : "border-neutral-500 text-ink hover:border-ink"
                 )}
               >
                 {size}

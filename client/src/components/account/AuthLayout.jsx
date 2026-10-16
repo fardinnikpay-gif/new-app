@@ -16,7 +16,7 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
           height={image.height}
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div aria-hidden="true" className="absolute inset-0 bg-ink/30" />
+        <div aria-hidden="true" className="absolute inset-0 bg-ink/40" />
         <p className="absolute inset-x-10 bottom-10 text-3xl font-light tracking-tight text-white">
           {tagline}
         </p>

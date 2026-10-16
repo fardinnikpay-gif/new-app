@@ -22,7 +22,6 @@ export default function AddToCartButton({ status, soldOut, onClick, size = "lg",
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={label}
-          aria-live="polite"
           className="flex items-center justify-center gap-2"
           {...SWAP}
         >

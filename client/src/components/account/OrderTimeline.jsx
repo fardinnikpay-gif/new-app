@@ -38,7 +38,7 @@ export default function OrderTimeline({ status }) {
                 "relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs",
                 done
                   ? "border-primary bg-primary text-white"
-                  : "border-neutral-300 bg-white text-neutral-400"
+                  : "border-neutral-300 bg-white text-neutral-500"
               )}
             >
               {done ? <Check className="h-4 w-4" aria-hidden="true" /> : index + 1}

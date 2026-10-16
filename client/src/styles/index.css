@@ -17,6 +17,8 @@
   --shadow-lift: 0 8px 30px rgb(0 0 0 / 0.1);
 
   --animate-marquee: marquee 40s linear infinite;
+  /* AA contrast (5.3:1) for text on white and for white text on it. Use `primary` for non-text accents. */
+--color-primary-strong: #2064E0;
 
   @keyframes marquee {
     from {
@@ -28,7 +30,10 @@
     }
   }
 }
-
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
 @layer base {
   :root {
     color-scheme: light;

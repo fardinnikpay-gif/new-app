@@ -21,8 +21,8 @@ const Textarea = forwardRef(function Textarea({ label, error, className, id, row
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         className={cx(
-          "w-full rounded-md border bg-white px-4 py-3 text-ink placeholder:text-neutral-400",
-          error ? "border-red-500" : "border-neutral-300 hover:border-neutral-400",
+          "w-full rounded-md border bg-white px-4 py-3 text-ink placeholder:text-neutral-500",
+          error ? "border-red-500" : "border-neutral-500 hover:border-ink",
           className
         )}
         {...rest}

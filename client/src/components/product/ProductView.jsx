@@ -1,8 +1,8 @@
+﻿import { buildBreadcrumbJsonLd, buildProductJsonLd, getProductCategory, getProductDescription } from "../../utils/product";
 import { useRef } from "react";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import useProductSelection from "../../hooks/useProductSelection";
 import useStickyBar from "../../hooks/useStickyBar";
-import { buildProductJsonLd, getProductCategory, getProductDescription } from "../../utils/product";
 import Seo from "../common/Seo";
 import Breadcrumbs from "../ui/Breadcrumbs";
 import Container from "../ui/Container";
@@ -12,7 +12,6 @@ import ProductInfo from "./ProductInfo";
 import ProductTabs from "./ProductTabs";
 import RelatedProducts from "./RelatedProducts";
 import useScrollShift from "../../hooks/useScrollShift";
-
 const TABLET_UP_QUERY = "(min-width: 768px)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const GALLERY_SHIFT = { y: 40 };
@@ -57,7 +56,7 @@ export default function ProductView({ product }) {
         description={getProductDescription(product)}
         image={product.images?.[0]?.url}
         type="product"
-        jsonLd={buildProductJsonLd(product)}
+        jsonLd={[buildProductJsonLd(product), buildBreadcrumbJsonLd(crumbs)]}
       />
 
       <Container className="pb-24 pt-6 md:pb-16 md:pt-10">
@@ -67,7 +66,7 @@ export default function ProductView({ product }) {
             <ProductGallery images={product.images} title={product.title} />
           </div>
           {/* sticky instead of a GSAP pin: same look, no pin-spacer, no JS */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:self-start lg:[@media(min-height:820px)]:sticky lg:[@media(min-height:820px)]:top-24">
             <ProductInfo product={product} selection={selection} ctaRef={ctaRef} />
           </div>
         </div>

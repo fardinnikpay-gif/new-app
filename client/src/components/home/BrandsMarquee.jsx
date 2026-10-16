@@ -19,7 +19,7 @@ function MarqueeList({ items, hidden }) {
           <Link
             to={`/shop?brand=${encodeURIComponent(brand)}`}
             tabIndex={hidden ? -1 : undefined}
-            className="px-6 py-2 text-3xl font-light tracking-tight text-neutral-400 transition-colors hover:text-ink md:px-10 md:text-5xl"
+            className="px-6 py-2 text-3xl font-light tracking-tight text-neutral-500 transition-colors hover:text-ink md:px-10 md:text-5xl"
           >
             {brand}
           </Link>

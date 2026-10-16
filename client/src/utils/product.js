@@ -98,3 +98,18 @@ export const buildProductJsonLd = (product) => {
     offers: offer,
   };
 };
+
+// schema.org BreadcrumbList. The last crumb (the current page) has no link.
+export const buildBreadcrumbJsonLd = (crumbs) => {
+  const siteUrl = (import.meta.env.VITE_SITE_URL ?? "").replace(/\/$/, "");
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.label,
+      ...(crumb.to && siteUrl ? { item: `${siteUrl}${crumb.to}` } : {}),
+    })),
+  };
+};

@@ -1,3 +1,4 @@
+﻿import { getShopDescription, getShopSeo, getShopTitle, toProductParams } from "../utils/shopQuery";
 import { useEffect, useMemo, useRef } from "react";
 import { getBrands, getProducts } from "../api/productApi";
 import { getCategories } from "../api/categoryApi";
@@ -8,7 +9,6 @@ import { useLenis } from "../components/motion/SmoothScroll";
 import { CATEGORY_ORDER } from "../data/homeContent";
 import { PAGE_SIZE } from "../data/shopFilters";
 import { sortCategories } from "../utils/categories";
-import { getShopDescription, getShopTitle, toProductParams } from "../utils/shopQuery";
 import Seo from "../components/common/Seo";
 import Pagination from "../components/common/Pagination";
 import Reveal from "../components/motion/Reveal";
@@ -23,7 +23,6 @@ import Container from "../components/ui/Container";
 import EmptyState from "../components/ui/EmptyState";
 import ErrorState from "../components/ui/ErrorState";
 import useScrollShift from "../hooks/useScrollShift";
-
 const DESKTOP_QUERY = "(min-width: 1024px)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const SCROLL_OFFSET_PX = 96; // header height + breathing room
@@ -61,12 +60,14 @@ export default function Shop() {
   const { data, loading, error, reload } = useAsync(() => getProducts(params), [queryKey]);
   const { data: brandData } = useAsync(() => getBrands(), []);
   const { data: categoryData } = useAsync(() => getCategories(), []);
+  const { canonical, noindex } = getShopSeo(filters);
 
   const products = data?.products ?? [];
   const total = data?.total ?? 0;
   const brands = (brandData?.brands ?? []).map(toBrandName).filter(Boolean);
   const loadedCategories = sortCategories(categoryData?.categories ?? []);
   const categories = loadedCategories.length ? loadedCategories : FALLBACK_CATEGORIES;
+  
 
   const title = getShopTitle(filters);
 
@@ -128,7 +129,7 @@ export default function Shop() {
 
   return (
     <>
-      <Seo title={title} description={getShopDescription(title)} />
+      <Seo title={title} description={getShopDescription(title)} canonical={canonical} noindex={noindex} />
       <Container className="pb-16 pt-8 md:pb-24 md:pt-12">
         <Reveal key={title} as="h1" className="mb-8 text-4xl font-light tracking-tight text-ink md:text-5xl">
           {title}
@@ -140,7 +141,7 @@ export default function Shop() {
           </Reveal>
         </div>
 
-        <div className="flex items-center justify-between gap-4 border-b border-neutral-200 pb-4">
+        <div className="flex items-center justify-between gap-x-4 gap-y-3 border-b border-neutral-200 pb-4">
           <div className="flex items-center gap-4">
             {!isDesktop && (
               <MobileFilters
@@ -186,3 +187,4 @@ export default function Shop() {
     </>
   );
 }
+

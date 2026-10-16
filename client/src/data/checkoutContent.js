@@ -23,3 +23,8 @@ export const isPaymentEnabled = (value) =>
 export const isStripeConfigured = Boolean(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.trim()
 );
+
+// Return the display label for an order's payment method.
+export const getPaymentLabel = (value) =>
+  paymentMethods.find((method) => method.value === value)?.label ??
+  (value || "Unknown payment method");

@@ -13,7 +13,7 @@ export default function HomeSectionHeader({ eyebrow, title, to, linkLabel = "Vie
       <div>
         <Reveal
           as="p"
-          className={cx("mb-3 text-sm uppercase tracking-widest", dark ? "text-accent" : "text-primary")}
+          className={cx("mb-3 text-sm uppercase tracking-widest", dark ? "text-accent" : "text-primary-strong")}
         >
           {eyebrow}
         </Reveal>

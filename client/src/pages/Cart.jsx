@@ -60,7 +60,7 @@ export default function Cart() {
       <Seo title="Your cart" description="Review the items in your cart." />
       <Container className="pb-16 pt-8 md:pb-24 md:pt-12">
         <Reveal as="h1" className="text-4xl font-light tracking-tight text-ink md:text-5xl">
-          Your cart <span className="text-neutral-400">({totalCount})</span>
+          Your cart <span className="text-neutral-500">({totalCount})</span>
         </Reveal>
 
         {location.state?.checkoutError && (
@@ -72,6 +72,7 @@ export default function Cart() {
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_24rem] lg:gap-16">
           <div>
+            <h2 className="sr-only">Items in your cart</h2>
             <ul className="divide-y divide-neutral-200 border-y border-neutral-200">
               <AnimatePresence initial={false}>
                 {items.map((item, index) => (
@@ -94,7 +95,7 @@ export default function Cart() {
             </Link>
           </div>
 
-          <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <div className="space-y-4 lg:self-start lg:[@media(min-height:820px)]:sticky lg:[@media(min-height:820px)]:top-24 ">
             {error && <ErrorState message={error.message} onRetry={reload} />}
             {(pricing || !error) && (
               <OrderSummary
