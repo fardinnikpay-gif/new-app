@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { createOrder } from "../api/orderApi";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import { toPreviewItems } from "../utils/cart";
 
 const STOCK_ERROR_STATUSES = [400, 409, 422];

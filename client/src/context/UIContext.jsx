@@ -1,8 +1,5 @@
-import { createContext, useContext, useMemo, useReducer } from "react";
-
-const UIContext = createContext(null);
-
-const CLOSED = { searchOpen: false, megaMenuOpen: false, mobileMenuOpen: false };
+import { UIContext } from "./UIContextObject";
+import { useMemo, useReducer } from "react";const CLOSED = { searchOpen: false, megaMenuOpen: false, mobileMenuOpen: false };
 
 // Only one panel is open at a time: opening one closes the others.
 function reducer(state, action) {
@@ -37,10 +34,4 @@ export function UIProvider({ children }) {
   const value = useMemo(() => ({ ...state, ...actions }), [state, actions]);
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
-}
-
-export function useUI() {
-  const context = useContext(UIContext);
-  if (!context) throw new Error("useUI must be used inside <UIProvider>");
-  return context;
 }

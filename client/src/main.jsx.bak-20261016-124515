@@ -1,0 +1,35 @@
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import "./styles/index.css";
+import App from "./App.jsx";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import ErrorPage from "./components/common/ErrorPage";
+
+const RELOAD_KEY = "chunk_reload_at";
+const RELOAD_COOLDOWN_MS = 10000;
+
+window.addEventListener("vite:preloadError", (event) => {
+  try {
+    const last = Number(sessionStorage.getItem(RELOAD_KEY) || 0);
+    if (Date.now() - last < RELOAD_COOLDOWN_MS) return; // let the ErrorBoundary show the page
+    sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+  } catch {
+    return;
+  }
+  event.preventDefault();
+  window.location.reload();
+});
+
+// ... در createRoot(...).render:
+<ErrorBoundary fallback={({ error, reset }) => <ErrorPage error={error} onRetry={reset} />}>
+  <App />
+</ErrorBoundary>
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>
+);

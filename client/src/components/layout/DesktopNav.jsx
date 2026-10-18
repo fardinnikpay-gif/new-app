@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { useUI } from "../../context/UIContext";
+import { useUI } from "../../context/useUI";
 import { NAV_CATEGORIES, SALE_LINK } from "../../data/navigation";
 import { shopUrl } from "../../utils/navigation";
 import MegaMenu from "./MegaMenu";

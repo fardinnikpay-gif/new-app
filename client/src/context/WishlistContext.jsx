@@ -1,12 +1,9 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { WishlistContext } from "./WishlistContextObject";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getWishlist, toggleWishlist } from "../api/wishlistApi";
-import { useAuth } from "./AuthContext";
-
-const WishlistContext = createContext(null);
-
-const EMPTY_IDS = new Set();
+import { useAuth } from "./useAuth";const EMPTY_IDS = new Set();
 const EMPTY_PRODUCTS = [];
 const INITIAL_DATA = { ownerId: null, ids: EMPTY_IDS, products: EMPTY_PRODUCTS, error: null };
 
@@ -118,8 +115,3 @@ export function WishlistProvider({ children }) {
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
 }
 
-export function useWishlist() {
-  const context = useContext(WishlistContext);
-  if (!context) throw new Error("useWishlist must be used inside <WishlistProvider>");
-  return context;
-}

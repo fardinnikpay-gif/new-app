@@ -73,8 +73,8 @@ export default function Orders() {
     body = (
       <>
         <ul className="space-y-4">
-          {orders.map((order, index) => (
-            <OrderListItem key={order._id} order={order} index={indexs} />
+          {orders.map((order) => (
+            <OrderListItem key={order._id} order={order} />
           ))}
         </ul>
         <Pagination page={page} pages={data.pages} onChange={goToPage} />

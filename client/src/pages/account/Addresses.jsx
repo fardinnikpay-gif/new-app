@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { addAddress, deleteAddress, updateAddress } from "../../api/userApi";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import { MAX_SAVED_ADDRESSES } from "../../data/checkoutContent";
 import { toShippingAddress } from "../../data/address";
 import { normalizePhone } from "../../utils/identifier";

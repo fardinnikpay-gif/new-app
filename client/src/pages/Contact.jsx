@@ -45,7 +45,7 @@ export default function Contact() {
     const body = `${values.message}\n\n— ${values.name} (${values.email})`;
     const href = buildMailto({ to: contactInfo.email, subject: values.subject, body });
     setMailtoHref(href);
-    window.location.href = href;
+    window.location.assign(href);
   };
 
   const writeAnother = () => {

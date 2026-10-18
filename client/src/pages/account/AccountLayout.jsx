@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, Outlet, useLocation, useMatch, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import ProtectedRoute from "../../routes/ProtectedRoute";
 import AccountNav from "../../components/account/AccountNav";
 import Reveal from "../../components/motion/Reveal";

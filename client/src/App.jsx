@@ -1,4 +1,4 @@
-
+﻿
 import { MotionConfig } from "framer-motion";
 import { HelmetProvider } from "react-helmet-async";
 
@@ -8,6 +8,7 @@ import ScrollToTop from "./components/common/ScrollToTop";
 import Toaster from "./components/common/Toaster";
 import Preloader from "./components/motion/Preloader";
 import ScrollProgress from "./components/motion/ScrollProgress";
+import OfflineBanner from "./components/common/OfflineBanner";
 import SmoothScroll from "./components/motion/SmoothScroll";
 
 import { AuthProvider } from "./context/AuthContext";
@@ -28,6 +29,7 @@ export default function App() {
                 <SmoothScroll>
                   <ScrollToTop />
                   <ScrollProgress />
+                  <OfflineBanner />
                   <ScrollRefresh />
                   <Preloader />
                   <AppRoutes />

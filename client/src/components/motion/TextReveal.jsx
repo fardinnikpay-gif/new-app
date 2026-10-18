@@ -1,20 +1,59 @@
+
 import { Fragment } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { getMotionTag } from "../../animations/motionTags";
-import { TEXT_STAGGER, VIEWPORT, makeStagger, wordReveal } from "../../animations/variants";
+import {
+  TEXT_STAGGER,
+  VIEWPORT,
+  makeStagger,
+  wordReveal,
+} from "../../animations/variants";
 
-// props: { text, as, stagger, delay, className } | words rise out of a mask, one after another
-// Screen readers read the sr-only full text; the animated words are aria-hidden.
-export default function TextReveal({ text, as = "h2", stagger = TEXT_STAGGER, delay = 0, className }) {
+const MOTION_TAGS = {
+  div: motion.div,
+  section: motion.section,
+  article: motion.article,
+  header: motion.header,
+  footer: motion.footer,
+  ul: motion.ul,
+  li: motion.li,
+  p: motion.p,
+  span: motion.span,
+  h1: motion.h1,
+  h2: motion.h2,
+  h3: motion.h3,
+};
+
+const PLAIN_TAGS = {
+  div: "div",
+  section: "section",
+  article: "article",
+  header: "header",
+  footer: "footer",
+  ul: "ul",
+  li: "li",
+  p: "p",
+  span: "span",
+  h1: "h1",
+  h2: "h2",
+  h3: "h3",
+};
+
+export default function TextReveal({
+  text,
+  as = "h2",
+  stagger = TEXT_STAGGER,
+  delay = 0,
+  className,
+}) {
   const reduceMotion = useReducedMotion();
+  const words = text.split(/\s+/).filter(Boolean);
 
   if (reduceMotion) {
-    const Tag = as;
+    const Tag = PLAIN_TAGS[as] ? as : "h2";
     return <Tag className={className}>{text}</Tag>;
   }
 
-  const MotionTag = getMotionTag(as);
-  const words = text.split(/\s+/).filter(Boolean);
+  const MotionTag = MOTION_TAGS[as] ?? motion.h2;
 
   return (
     <MotionTag

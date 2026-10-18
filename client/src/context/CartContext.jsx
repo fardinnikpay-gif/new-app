@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { CartContext } from "./CartContextObject";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CART_BUMP_EVENT,
   CART_STORAGE_KEY,
@@ -7,11 +8,7 @@ import {
   makeCartKey,
   readStoredCart,
   writeStoredCart,
-} from "../utils/cart";
-
-const CartContext = createContext(null);
-
-export function CartProvider({ children }) {
+} from "../utils/cart";export function CartProvider({ children }) {
   const [items, setItems] = useState(readStoredCart);
   const itemsRef = useRef(items); // always the latest items, even between two calls in one tick
 
@@ -126,8 +123,3 @@ export function CartProvider({ children }) {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
-export function useCart() {
-  const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used inside <CartProvider>");
-  return context;
-}

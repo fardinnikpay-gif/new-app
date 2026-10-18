@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import { LOW_STOCK_THRESHOLD, SUCCESS_RESET_MS } from "../data/productContent";
 
 const inStock = (variant) => variant.stock > 0;

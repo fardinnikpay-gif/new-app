@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useUI } from "../../context/UIContext";
+import { useUI } from "../../context/useUI";
 import { NAV_CATEGORIES, SALE_LINK } from "../../data/navigation";
 import useLiveSearch, { MIN_QUERY_LENGTH } from "../../hooks/useLiveSearch";
 import { cx } from "../../utils/cx";

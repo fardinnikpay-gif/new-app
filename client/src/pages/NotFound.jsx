@@ -1,28 +1,48 @@
 import { Link } from "react-router-dom";
+import { CATEGORY_ORDER } from "../data/homeContent";
 import Seo from "../components/common/Seo";
-import TextReveal from "../components/motion/TextReveal";
+import Reveal from "../components/motion/Reveal";
 import Button from "../components/ui/Button";
 import Container from "../components/ui/Container";
 
+const DELAY_S = { title: 0.1, text: 0.2, actions: 0.3 };
+
 export default function NotFound() {
   return (
-    <Container as="section" className="grid min-h-[60vh] place-items-center py-16">
+    <>
       <Seo title="Page not found" noindex />
-      <div className="space-y-6 text-center">
-        <p className="text-sm font-medium uppercase tracking-widest text-primary">404</p>
-        <TextReveal as="h1" text="This page could not be found" className="text-4xl md:text-6xl" />
-        <p className="mx-auto max-w-md text-neutral-500">
-          The link may be broken, or the page may have been removed.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
+      <Container className="flex min-h-[60svh] flex-col items-center justify-center py-16 text-center">
+        <Reveal as="p" className="text-8xl font-light tracking-tight text-neutral-500 md:text-9xl">
+          404
+        </Reveal>
+        <Reveal as="h1" delay={DELAY_S.title} className="mt-4 text-3xl font-light tracking-tight text-ink md:text-4xl">
+          Page not found
+        </Reveal>
+        <Reveal as="p" delay={DELAY_S.text} className="mt-3 max-w-md text-neutral-600">
+          The page you're looking for doesn't exist or has moved.
+        </Reveal>
+
+        <Reveal delay={DELAY_S.actions} className="mt-8 flex flex-wrap justify-center gap-3">
           <Button as={Link} to="/">
             Back to home
           </Button>
           <Button as={Link} to="/shop" variant="outline">
             Browse the shop
           </Button>
-        </div>
-      </div>
-    </Container>
+        </Reveal>
+
+        <nav aria-label="Popular categories" className="mt-8 flex gap-2">
+          {CATEGORY_ORDER.map((key) => (
+            <Link
+              key={key}
+              to={`/shop?category=${key}`}
+              className="inline-flex min-h-11 items-center px-3 text-sm capitalize text-neutral-600 underline-offset-4 hover:text-ink hover:underline"
+            >
+              {key}
+            </Link>
+          ))}
+        </nav>
+      </Container>
+    </>
   );
 }

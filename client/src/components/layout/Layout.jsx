@@ -1,12 +1,14 @@
+﻿import { Outlet } from "react-router-dom";
 import PageTransition from "../motion/PageTransition";
 import BackToTop from "./BackToTop";
 import Footer from "./Footer";
 import Header from "./Header";
 import SearchOverlay from "./SearchOverlay";
+import RouteErrorBoundary from "../common/RouteErrorBoundary";
 
 // Page shell. <main> always keeps a padding-top equal to the Header height, so nothing shifts while pages fade.
 // The Hero (step 11) slides under the Header with a negative margin.
-export default function Layout({ children }) {
+export default function Layout() {
   return (
     <div className="flex min-h-dvh flex-col">
       <a
@@ -18,7 +20,9 @@ export default function Layout({ children }) {
       <Header />
       <main id="main-content" tabIndex={-1} className="flex-1 pt-[var(--header-height)] outline-none">
         <PageTransition>
-          <Outlet />
+          <RouteErrorBoundary>
+            <Outlet />
+          </RouteErrorBoundary>
         </PageTransition>
       </main>
       <Footer />
@@ -27,3 +31,4 @@ export default function Layout({ children }) {
     </div>
   );
 }
+

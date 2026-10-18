@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { DURATION, EASE } from "../../animations/variants";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../context/useCart";
 import useFocusTrap from "../../hooks/useFocusTrap";
 import { getColors, getSizes, isColorAvailable, isInStock, isSizeAvailable } from "../../utils/product";
 import Button from "../ui/Button";

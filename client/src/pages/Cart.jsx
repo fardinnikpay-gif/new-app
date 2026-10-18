@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import useCartPricing from "../hooks/useCartPricing";
 import useCoupon from "../hooks/useCoupon";
 import { findLine } from "../utils/cart";

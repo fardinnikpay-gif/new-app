@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { updateProfile } from "../../api/userApi";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import { normalizePhone } from "../../utils/identifier";
 import { makeProfileSchema } from "../../utils/validators";
 import Seo from "../../components/common/Seo";

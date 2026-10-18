@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { parseIdentifier } from "../utils/identifier";
 import { getRedirectPath } from "../utils/redirect";
 import { registerSchema } from "../utils/validators";

@@ -47,7 +47,7 @@ export default function PageTransition({ children }) {
         key={transitionKey}
         initial={reduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        exit={reduceMotion ? undefined : { opacity: 0 }}
         transition={{
           duration: reduceMotion ? 0 : DURATION.fast,
           ease: "easeOut",

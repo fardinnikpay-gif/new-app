@@ -68,7 +68,7 @@ export const contactSchema = z.object({
     .min(10, "Your message is too short")
     .max(1500, "Please keep your message under 1500 characters"),
 });
-export const makeProfileSchema = (emailMissing = false) =>
+export const makeProfileSchema = () =>
   z.object({
     name: z.string().trim().min(2, "Enter your name").max(60, "Name is too long"),
     phone: z

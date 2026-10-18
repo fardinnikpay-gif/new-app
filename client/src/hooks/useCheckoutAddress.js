@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { addAddress } from "../api/userApi";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { MAX_SAVED_ADDRESSES, NEW_ADDRESS_ID } from "../data/checkoutContent";
 import { sameAddress, toShippingAddress } from "../data/address";
 import { normalizePhone } from "../utils/identifier";

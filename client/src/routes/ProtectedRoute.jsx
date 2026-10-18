@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import RouteSpinner from "./RouteSpinner";
 
 // props: { children } | guests are sent to /login and come back to the same page afterwards (state.from)

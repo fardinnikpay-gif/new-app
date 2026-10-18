@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Heart, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DURATION, EASE } from "../../animations/variants";
-import { useWishlist } from "../../context/WishlistContext";
+import { useWishlist } from "../../context/useWishlist";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import { cx } from "../../utils/cx";
 import { QUERIES } from "../../utils/media";

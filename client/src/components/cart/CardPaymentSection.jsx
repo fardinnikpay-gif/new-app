@@ -1,16 +1,16 @@
-﻿import { Link } from "react-router-dom";
+﻿import { lazy, Suspense, useId } from "react";
+import Skeleton from "../ui/Skeleton";
+import { Link } from "react-router-dom";
 import { formatOrderNumber } from "../../utils/order";
 import FormError from "../account/FormError";
 import Button from "../ui/Button";
-import Skeleton from "../ui/Skeleton";
-import StripePaymentForm from "./StripePaymentForm";
-import { lazy, Suspense, useId } from "react";
+
+const StripePaymentForm = lazy(() => import("./StripePaymentForm"));
 
 // Shown instead of the address/payment sections once the order exists.
 export default function CardPaymentSection({ orderId, clientSecret, loading, error, onRetry, onSuccess }) {
   const headingId = useId();
 
-  const StripePaymentForm = lazy(() => import("./StripePaymentForm"));
 
   return (
     <section aria-labelledby={headingId}>

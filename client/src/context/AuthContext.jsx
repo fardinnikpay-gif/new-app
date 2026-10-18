@@ -1,11 +1,8 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { AuthContext } from "./AuthContextObject";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { AUTH_EXPIRED_EVENT } from "../api/axios";
-import * as authApi from "../api/authApi";
-
-const AuthContext = createContext(null);
-
-const SESSION_EXPIRED_TOAST_ID = "session-expired";
+import * as authApi from "../api/authApi";const SESSION_EXPIRED_TOAST_ID = "session-expired";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -99,8 +96,3 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used inside <AuthProvider>");
-  return context;
-}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
-import { useWishlist } from "../../context/WishlistContext";
+import { useWishlist } from "../../context/useWishlist";
 import { MAX_QTY_DEFAULT } from "../../data/productContent";
 import { hasDiscount } from "../../utils/product";
 import { cx } from "../../utils/cx";

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, useReducedMotion } from "framer-motion";
 import toast from "react-hot-toast";
 import { clearWishlist } from "../../api/wishlistApi";
-import { useWishlist } from "../../context/WishlistContext";
+import { useWishlist } from "../../context/useWishlist";
 import Seo from "../../components/common/Seo";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 import AccountSection from "../../components/account/AccountSection";
@@ -17,27 +17,30 @@ const SKELETON_COUNT = 6;
 const GRID = "grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3";
 
 export default function Wishlist() {
+
   const { ids, products, toggle, load } = useWishlist();
   const reduceMotion = useReducedMotion();
-  const loadRef = useRef(load); // `load` may change identity between renders
-  loadRef.current = load;
 
   const [status, setStatus] = useState({ loading: true, error: null });
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [cleared, setCleared] = useState(false); // optimistic "Clear all"
+  const [cleared, setCleared] = useState(false);
 
   const loadList = useCallback(async () => {
     setStatus({ loading: true, error: null });
     try {
-      await loadRef.current();
+      await load();
       setStatus({ loading: false, error: null });
     } catch (error) {
       setStatus({ loading: false, error });
     }
-  }, []);
+  }, [load]);
 
   useEffect(() => {
-    loadList(); // always refresh when the page opens
+    const timer = setTimeout(() => {
+      void loadList();
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [loadList]);
 
   // single source of truth: ids decides what is shown, so heart clicks and Remove behave the same
@@ -66,7 +69,7 @@ export default function Wishlist() {
     }
 
     try {
-      await loadRef.current(); // syncs ids, so hearts elsewhere update too
+      await load() // syncs ids, so hearts elsewhere update too
       setCleared(false);
     } catch {
       // already empty on the server; keep showing the empty state
@@ -106,7 +109,7 @@ export default function Wishlist() {
         </div>
         <ul className={GRID}>
           <AnimatePresence mode="popLayout">
-            {items.map((product,index) => (
+            {items.map((product, index) => (
               <WishlistItem
                 key={product._id}
                 product={product}

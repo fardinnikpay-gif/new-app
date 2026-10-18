@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { getOrderById } from "../api/orderApi";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import { getPaymentLabel } from "../data/checkoutContent";
 import useAsync from "../hooks/useAsync";
 import useCouponCode from "../hooks/useCouponCode";
@@ -51,11 +51,10 @@ export default function OrderSuccess() {
   const { data, error, reload } = useAsync(() => getOrderById(orderId), [orderId]);
 
   // keep the last good order so polling never flashes a skeleton
-  const [order, setOrder] = useState(null);
+  // Keep the latest valid order without synchronizing state in an effect.
+  const order = data?.order ?? null;
+
   const [polls, setPolls] = useState(0);
-  useEffect(() => {
-    if (data?.order) setOrder(data.order);
-  }, [data]);
 
   // Card payments that redirect (e.g. 3-D Secure) come back here with redirect_status.
   // Only then is the cart cleared, so just viewing an old order never empties the cart.

@@ -4,7 +4,7 @@ import { User } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { DURATION, EASE } from "../../animations/variants";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import HeaderAction from "./HeaderAction";
 
 const ITEM = "flex min-h-11 w-full items-center rounded-lg px-3 text-left text-sm hover:bg-neutral-100";

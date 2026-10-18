@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/useCart";
 import { DEFAULT_PAYMENT_METHOD, isPaymentEnabled } from "../data/checkoutContent";
 import useCardPayment from "../hooks/useCardPayment";
 import useCartPricing from "../hooks/useCartPricing";
@@ -27,7 +27,7 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState(DEFAULT_PAYMENT_METHOD);
   const { pricing, loading, error, issues, reload } = useCartPricing(items, coupon.couponCode);
   const { placeOrder, placing, error: placeError, stockProblem } = usePlaceOrder();
-  const orderPlacedRef = useRef(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const submitLockRef = useRef(false);
 
   const paymentLocked = card.active; // the order exists and the card form is shown
@@ -40,7 +40,7 @@ export default function Checkout() {
 
   // The cart is cleared only after the order is really done (COD placed / card paid).
   const finishOrder = (orderId) => {
-    orderPlacedRef.current = true; // an empty cart after this point is expected
+    setOrderPlaced(true);
     coupon.setCouponCode("");
     clearCart();
     navigate(`/checkout/success/${orderId}`, { replace: true });
@@ -61,7 +61,7 @@ export default function Checkout() {
 
   if (!isReady) return <CartSkeleton />;
   if (items.length === 0) {
-    return orderPlacedRef.current ? null : <Navigate to="/cart" replace />;
+    return orderPlaced ? null : <Navigate to="/cart" replace />;
   }
 
   const canPlace =

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { cancelOrder, getOrderById } from "../../api/orderApi";
@@ -24,19 +24,17 @@ const NOT_ALLOWED_STATUSES = [403, 404]; // not yours / doesn't exist: same mess
 export default function OrderDetail() {
   const { id } = useParams();
   const { data, error, reload } = useAsync(() => getOrderById(id), [id]);
-  const [order, setOrder] = useState(null);
+  const [updatedOrder, setUpdatedOrder] = useState(null);
+  const order = updatedOrder ?? data?.order ?? null;
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
-  useEffect(() => {
-    setOrder(data?.order ?? null);
-  }, [data]);
-
+  
   const handleCancel = async () => {
     setCancelling(true);
     try {
       const { order: updated } = await cancelOrder(id);
-      setOrder(updated);
+      setUpdatedOrder(updated);
       toast.success("Order cancelled");
     } catch (err) {
       toast.error(err.message || "Could not cancel this order.");
