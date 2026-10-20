@@ -18,14 +18,14 @@ const toEntries = (address) =>
       String(value).trim() !== ""
   );
 
-export default function ShippingAddress({ address }) {
+export default function ShippingAddress({ address, emptyText = "No shipping address." }) {
   if (typeof address === "string" && address.trim()) {
     return <p className="text-sm text-ink">{address}</p>;
   }
 
   const entries = address && typeof address === "object" ? toEntries(address) : [];
-  if (entries.length === 0) {
-    return <p className="text-sm text-gray-500">No shipping address.</p>;
+   if (entries.length === 0) {
+    return <p className="text-sm text-gray-500">{emptyText}</p>;
   }
 
   return (

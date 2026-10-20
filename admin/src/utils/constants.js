@@ -59,3 +59,6 @@ export const PAYMENT_METHOD_LABELS = { cod: "Cash on delivery", online: "Online 
 
 // The normal path of an order, shown in the detail timeline.
 export const ORDER_FLOW = ["pending", "processing", "shipped", "delivered"];
+
+export const ADMIN_ROLE = "admin";
+export const ROLE_LABELS = { admin: "Admin", user: "Customer" };
