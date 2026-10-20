@@ -36,3 +36,15 @@ export const ORDER_STATUS_LABELS = {
 };
 
 export const CATEGORY_LABELS = { men: "Men", women: "Women", kids: "Kids" };
+
+export const PRODUCT_LIMITS = { title: 120, brand: 60, description: 2000, variantText: 30 };
+
+// Suggestions only (shown in a datalist); any text is still accepted.
+export const SIZE_SUGGESTIONS = [
+  "XS", "S", "M", "L", "XL", "XXL",
+  "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "10Y", "12Y", "14Y",
+];
+export const COLOR_SUGGESTIONS = [
+  "black", "white", "gray", "navy", "blue", "red", "green",
+  "beige", "brown", "pink", "yellow", "orange", "purple",
+];
