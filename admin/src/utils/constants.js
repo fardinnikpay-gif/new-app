@@ -23,3 +23,14 @@ export const DEBOUNCE_MS = 400;
 export const DESKTOP_QUERY = "(min-width: 1024px)";
 export const SIDEBAR_STORAGE_KEY = "admin:sidebar-collapsed";
 export const SITE_NAME = import.meta.env.VITE_SITE_NAME || "Store";
+
+export const DASHBOARD_LIST_LIMIT = 5;
+export const ORDER_NUMBER_LENGTH = 8;
+
+export const ORDER_STATUS_LABELS = {
+  pending: "Pending",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};

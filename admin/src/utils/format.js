@@ -37,3 +37,10 @@ export const formatDateTime = (iso) => {
   const date = toDate(iso);
   return date ? dateTimeFormatter.format(date) : "-";
 };
+
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+export const formatNumber = (value) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? numberFormatter.format(number) : "-";
+};

@@ -28,6 +28,17 @@
   --shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.15);
 }
 
+/* Chart colors. `static` = always emitted, because recharts reads them via var(). */
+@theme static {
+  --color-chart-pending: #f59e0b;
+  --color-chart-processing: #60a5fa;
+  --color-chart-shipped: #1b5cc4;
+  --color-chart-delivered: #16a34a;
+  --color-chart-cancelled: #dc2626;
+  --color-chart-grid: #e5e7eb;
+  --color-chart-axis: #6b7280;
+}
+
 @layer base {
   html {
     color-scheme: light;
