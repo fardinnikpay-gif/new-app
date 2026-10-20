@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import * as authApi from "../api/authApi";
 import { AUTH_EXPIRED_EVENT } from "../api/axios";
 import { AuthContext } from "./authContextValue";
-
 import { ADMIN_ROLE } from "../utils/constants";
-import { AuthContext } from "./authContextValue";
 
 const NO_ACCESS_MESSAGE = "This account has no admin access";
 const NO_ACCESS_STATUS = 403;
@@ -13,11 +11,6 @@ const EXPIRED_MESSAGE = "Your session has expired. Please sign in again.";
 const EXPIRED_TOAST_ID = "auth-expired";
 const SIGN_OUT_FAILED_MESSAGE = "Could not sign out. Check your connection and try again.";
 const UNAUTHORIZED_STATUS = 401;
-
-const NO_ACCESS_MESSAGE = "This account has no admin access";
-const NO_ACCESS_STATUS = 403;
-const EXPIRED_MESSAGE = "Your session has expired. Please sign in again.";
-const EXPIRED_TOAST_ID = "auth-expired";
 
 const isAdmin = (user) => user?.role === ADMIN_ROLE;
 
@@ -33,13 +26,19 @@ export default function AuthProvider({ children }) {
     const restoreSession = async () => {
       try {
         const user = await authApi.getMe(controller.signal);
-        // A non-admin cookie (e.g. a shop customer) is treated as signed out.
-        // No logout call here: it would end that customer's own session.
-        if (!controller.signal.aborted && isAdmin(user)) setAdmin(user);
+
+        // A non-admin cookie is treated as signed out.
+        // Do not log out the customer's own session.
+        if (!controller.signal.aborted && isAdmin(user)) {
+          setAdmin(user);
+        }
       } catch {
-        // Not signed in, or the server is unreachable: show the login page.
+        // Not signed in, or the server is unreachable.
       }
-      if (!controller.signal.aborted) setLoading(false);
+
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     };
 
     restoreSession();
@@ -64,8 +63,9 @@ export default function AuthProvider({ children }) {
       try {
         await authApi.logout();
       } catch {
-        // Ignore: the backend adminOnly check still protects every admin route.
+        // Ignore; backend authorization still protects admin routes.
       }
+
       const error = new Error(NO_ACCESS_MESSAGE);
       error.status = NO_ACCESS_STATUS;
       throw error;
@@ -75,8 +75,7 @@ export default function AuthProvider({ children }) {
     return user;
   }, []);
 
-  // Resolves to true once the admin is signed out. If the server cannot be reached the cookie
-  // may still be valid, so we stay signed in and say so (a 401 means it is already invalid).
+  // Keep the admin signed in if logout fails due to a network error.
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
@@ -86,11 +85,19 @@ export default function AuthProvider({ children }) {
         return false;
       }
     }
+
     setAdmin(null);
     return true;
   }, []);
 
-  const value = useMemo(() => ({ admin, loading, login, logout }), [admin, loading, login, logout]);
+  const value = useMemo(
+    () => ({ admin, loading, login, logout }),
+    [admin, loading, login, logout]
+  );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
