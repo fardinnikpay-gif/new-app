@@ -17,3 +17,4 @@ export const ORDER_TRANSITIONS = {
   delivered: [],
   cancelled: [],
 };
+export const DEBOUNCE_MS = 400;
