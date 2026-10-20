@@ -34,3 +34,5 @@ export const ORDER_STATUS_LABELS = {
   delivered: "Delivered",
   cancelled: "Cancelled",
 };
+
+export const CATEGORY_LABELS = { men: "Men", women: "Women", kids: "Kids" };

@@ -58,6 +58,9 @@ export default function usePagedQuery(initial = {}) {
     (key, value) => update({ [key]: value }, { replace: false, resetPage: true }),
     [update]
   );
+  // Clears search, filters and page in a single URL update.
+  // (Calling setSearch + setFilter back to back would overwrite each other.)
+  const reset = useCallback(() => setSearchParams({}, { replace: false }), [setSearchParams]);
 
-  return { params, setPage, setSearch, setFilter };
+  return { params, setPage, setSearch, setFilter, reset };
 }

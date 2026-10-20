@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // fn receives an AbortSignal: useAsync((signal) => getAdminOrders(params, signal), [params])
 // Re-runs when deps change or reload() is called; the previous request is aborted.
+// setData(updater) patches the loaded data locally (optimistic updates); the next fetch replaces it.
 export default function useAsync(fn, deps = []) {
   const [state, setState] = useState({ data: null, loading: true, error: null });
   const [reloadKey, setReloadKey] = useState(0);
@@ -31,5 +32,12 @@ export default function useAsync(fn, deps = []) {
 
   const reload = useCallback(() => setReloadKey((key) => key + 1), []);
 
-  return { ...state, reload };
+  const setData = useCallback((updater) => {
+    setState((prev) => ({
+      ...prev,
+      data: typeof updater === "function" ? updater(prev.data) : updater,
+    }));
+  }, []);
+
+  return { ...state, reload, setData };
 }
