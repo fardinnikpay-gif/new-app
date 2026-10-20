@@ -9,7 +9,7 @@ import Input from "../components/ui/Input";
 import useAuth from "../hooks/useAuth";
 import { loginSchema } from "../validators/loginSchema";
 
-const SITE_NAME = import.meta.env.VITE_SITE_NAME || "Store";
+import { SITE_NAME } from "../utils/constants";
 const DEFAULT_REDIRECT = "/dashboard";
 
 export default function Login() {

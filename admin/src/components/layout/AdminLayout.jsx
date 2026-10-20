@@ -1,6 +1,8 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import useMediaQuery from "../../hooks/useMediaQuery";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
+import { getPageTitle } from "../../utils/navigation";
 import useSidebarCollapsed from "../../hooks/useSidebarCollapsed";
 import { DESKTOP_QUERY, SITE_NAME } from "../../utils/constants";
 import { cx } from "../../utils/cx";
@@ -10,12 +12,15 @@ import Sidebar from "./Sidebar";
 import SidebarNav from "./SidebarNav";
 import Topbar from "./Topbar";
 
+
 const MAIN_ID = "main-content";
 
 export default function AdminLayout() {
   const [collapsed, toggleCollapsed] = useSidebarCollapsed();
   const [menuOpen, setMenuOpen] = useState(false);
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const { pathname } = useLocation();
+  useDocumentTitle(`${getPageTitle(pathname)} · ${SITE_NAME} Admin`);
 
   const openMenu = useCallback(() => setMenuOpen(true), []);
   const closeMenu = useCallback(() => setMenuOpen(false), []);

@@ -4,7 +4,16 @@ import * as authApi from "../api/authApi";
 import { AUTH_EXPIRED_EVENT } from "../api/axios";
 import { AuthContext } from "./authContextValue";
 
-const ADMIN_ROLE = "admin";
+import { ADMIN_ROLE } from "../utils/constants";
+import { AuthContext } from "./authContextValue";
+
+const NO_ACCESS_MESSAGE = "This account has no admin access";
+const NO_ACCESS_STATUS = 403;
+const EXPIRED_MESSAGE = "Your session has expired. Please sign in again.";
+const EXPIRED_TOAST_ID = "auth-expired";
+const SIGN_OUT_FAILED_MESSAGE = "Could not sign out. Check your connection and try again.";
+const UNAUTHORIZED_STATUS = 401;
+
 const NO_ACCESS_MESSAGE = "This account has no admin access";
 const NO_ACCESS_STATUS = 403;
 const EXPIRED_MESSAGE = "Your session has expired. Please sign in again.";
@@ -66,13 +75,19 @@ export default function AuthProvider({ children }) {
     return user;
   }, []);
 
+  // Resolves to true once the admin is signed out. If the server cannot be reached the cookie
+  // may still be valid, so we stay signed in and say so (a 401 means it is already invalid).
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
-    } catch {
-      // Clear local state even if the request fails.
+    } catch (error) {
+      if (error.status !== UNAUTHORIZED_STATUS) {
+        toast.error(SIGN_OUT_FAILED_MESSAGE);
+        return false;
+      }
     }
     setAdmin(null);
+    return true;
   }, []);
 
   const value = useMemo(() => ({ admin, loading, login, logout }), [admin, loading, login, logout]);

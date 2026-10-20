@@ -3,7 +3,7 @@ import { getAdminUser } from "../../api/userApi";
 import useAsync from "../../hooks/useAsync";
 import { formatDateTime, formatNumber } from "../../utils/format";
 import { getAddresses, getUserDisplayName } from "../../utils/user";
-import DetailSection from "../orders/DetailSection";
+import DetailSection from "../common/DetailSection";
 import EmptyState from "../ui/EmptyState";
 import ErrorState from "../ui/ErrorState";
 import RoleBadge from "./RoleBadge";

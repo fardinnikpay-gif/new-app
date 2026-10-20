@@ -8,7 +8,7 @@ import { formatDateTime } from "../../utils/format";
 import { getCustomer, getItemCount, getPaymentLabel, mergeOrder } from "../../utils/order";
 import EmptyState from "../ui/EmptyState";
 import ErrorState from "../ui/ErrorState";
-import DetailSection from "./DetailSection";
+import DetailSection from "../common/DetailSection";
 import MarkPaidButton from "./MarkPaidButton";
 import OrderCustomer from "./OrderCustomer";
 import OrderDetailSkeleton from "./OrderDetailSkeleton";

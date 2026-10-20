@@ -20,6 +20,6 @@ export const getPageTitle = (pathname) => {
   const subPage = SUB_PAGE_TITLES.find(({ path }) => matchPath({ path, end: true }, pathname));
   if (subPage) return subPage.title;
 
-  const item = NAV_ITEMS.find(({ to }) => matchPath({ path: to, end: false }, pathname));
+  const item = NAV_ITEMS.find(({ to }) => matchPath({ path: to, end: true }, pathname));
   return item ? item.label : "Page not found";
 };

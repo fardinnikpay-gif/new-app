@@ -33,11 +33,12 @@ export default function AdminMenu() {
     };
   }, [open]);
 
-  const handleLogout = async () => {
+   const handleLogout = async () => {
     setLoggingOut(true);
-    await logout(); // ProtectedRoute redirects to /login once admin is null.
+    const signedOut = await logout(); // ProtectedRoute redirects to /login once admin is null.
+    if (!signedOut) setLoggingOut(false);
   };
-
+  
   return (
     <div ref={containerRef} className="relative">
       <button

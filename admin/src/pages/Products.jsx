@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { getAdminProducts } from "../api/productApi";
+import { deleteProduct, getAdminProducts } from "../api/productApi"
 import PageHeader from "../components/common/PageHeader";
 import Pagination from "../components/common/Pagination";
 import ProductFilters from "../components/products/ProductFilters";
@@ -11,7 +11,7 @@ import ConfirmDialog from "../components/ui/ConfirmDialog";
 import EmptyState from "../components/ui/EmptyState";
 import ErrorState from "../components/ui/ErrorState";
 import useAsync from "../hooks/useAsync";
-import useDeleteProduct from "../hooks/useDeleteProduct";
+import useConfirmDelete from "../hooks/useConfirmDelete";
 import usePagedQuery from "../hooks/usePagedQuery";
 import useToggleProduct from "../hooks/useToggleProduct";
 import { PAGE_SIZE } from "../utils/constants";
@@ -38,7 +38,10 @@ export default function Products() {
     else reload();
   }, [products.length, page, setPage, reload]);
 
-  const deletion = useDeleteProduct(handleDeleted);
+  const deletion = useConfirmDelete(deleteProduct, {
+    successMessage: "Product deleted",
+    onDeleted: handleDeleted,
+  });
 
   // The URL can point past the last page (e.g. ?page=99): jump to the real last page.
   useEffect(() => {
