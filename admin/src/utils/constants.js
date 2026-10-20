@@ -52,3 +52,10 @@ export const COLOR_SUGGESTIONS = [
 export const COUPON_TYPES = ["percent", "fixed"];
 export const COUPON_TYPE_LABELS = { percent: "Percentage", fixed: "Fixed amount" };
 export const COUPON_LIMITS = { codeMin: 3, codeMax: 20, percentMin: 1, percentMax: 100 };
+
+export const COD_PAYMENT_METHOD = "cod";
+export const CANCELLED_STATUS = "cancelled";
+export const PAYMENT_METHOD_LABELS = { cod: "Cash on delivery", online: "Online payment" };
+
+// The normal path of an order, shown in the detail timeline.
+export const ORDER_FLOW = ["pending", "processing", "shipped", "delivered"];

@@ -6,6 +6,7 @@ export default function ConfirmDialog({
   title,
   message,
   confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   tone = "danger",
   onConfirm,
   onClose,
@@ -21,7 +22,7 @@ export default function ConfirmDialog({
       <p className="text-sm text-gray-600">{message}</p>
       <div className="mt-6 flex justify-end gap-3">
         <Button variant="outline" onClick={handleClose} disabled={loading}>
-          Cancel
+          {cancelLabel}
         </Button>
         <Button
           variant={tone === "danger" ? "danger" : "primary"}
