@@ -18,3 +18,8 @@ export const ORDER_TRANSITIONS = {
   cancelled: [],
 };
 export const DEBOUNCE_MS = 400;
+
+// Keep equal to Tailwind's `lg` breakpoint (64rem).
+export const DESKTOP_QUERY = "(min-width: 1024px)";
+export const SIDEBAR_STORAGE_KEY = "admin:sidebar-collapsed";
+export const SITE_NAME = import.meta.env.VITE_SITE_NAME || "Store";

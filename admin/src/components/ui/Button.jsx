@@ -14,8 +14,10 @@ const SIZES = {
   lg: "h-11 px-5 text-base",
 };
 
+// `as` lets a router <Link> look like a button: <Button as={Link} to="/x">.
 // Icon-only buttons must pass aria-label.
 export default function Button({
+  as: Component = "button",
   variant = "primary",
   size = "md",
   loading = false,
@@ -25,10 +27,11 @@ export default function Button({
   children,
   ...rest
 }) {
+  const nativeProps = Component === "button" ? { type, disabled: disabled || loading } : {};
+
   return (
-    <button
-      type={type}
-      disabled={disabled || loading}
+    <Component
+      {...nativeProps}
       aria-busy={loading || undefined}
       className={cx(
         "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60",
@@ -40,6 +43,6 @@ export default function Button({
     >
       {loading && <Spinner size="sm" />}
       {children}
-    </button>
+    </Component>
   );
 }

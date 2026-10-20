@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import FullPageSpinner from "../components/common/FullPageSpinner";
+import AdminLayout from "../components/layout/AdminLayout";
 import ProtectedRoute from "./ProtectedRoute";
 
 const Login = lazy(() => import("../pages/Login"));
@@ -20,18 +21,20 @@ export default function AppRoutes() {
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        {/* Everything below requires a signed-in admin. */}
+        {/* Everything below requires a signed-in admin and uses the layout. */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/products/new" element={<ProductCreate />} />
-          <Route path="/products/:id/edit" element={<ProductEdit />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/coupons" element={<Coupons />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="*" element={<NotFound />} />
+          <Route element={<AdminLayout />}>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/new" element={<ProductCreate />} />
+            <Route path="/products/:id/edit" element={<ProductEdit />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/coupons" element={<Coupons />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Route>
       </Routes>
     </Suspense>

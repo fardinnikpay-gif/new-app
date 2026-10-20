@@ -1,6 +1,19 @@
-// admin/src/pages/NotFound.jsx
-import StubPage from "../components/common/StubPage";
+import { Compass } from "lucide-react";
+import { Link } from "react-router-dom";
+import Button from "../components/ui/Button";
+import EmptyState from "../components/ui/EmptyState";
 
 export default function NotFound() {
-  return <StubPage title="404 - Page not found" step={3} />;
+  return (
+    <EmptyState
+      icon={Compass}
+      title="Page not found"
+      message="The page you are looking for does not exist or was moved."
+      action={
+        <Button as={Link} to="/dashboard">
+          Back to dashboard
+        </Button>
+      }
+    />
+  );
 }
