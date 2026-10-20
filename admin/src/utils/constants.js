@@ -48,3 +48,7 @@ export const COLOR_SUGGESTIONS = [
   "black", "white", "gray", "navy", "blue", "red", "green",
   "beige", "brown", "pink", "yellow", "orange", "purple",
 ];
+
+export const COUPON_TYPES = ["percent", "fixed"];
+export const COUPON_TYPE_LABELS = { percent: "Percentage", fixed: "Fixed amount" };
+export const COUPON_LIMITS = { codeMin: 3, codeMax: 20, percentMin: 1, percentMax: 100 };

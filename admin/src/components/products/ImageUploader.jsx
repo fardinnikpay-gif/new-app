@@ -14,6 +14,7 @@ export default function ImageUploader({
   onRemoveExisting,
   onRemoveNew,
   max = MAX_PRODUCT_IMAGES,
+  showMain = true,
 }) {
   const [errors, setErrors] = useState([]);
   const [dragging, setDragging] = useState(false);
@@ -95,7 +96,7 @@ export default function ImageUploader({
               key={image.publicId}
               src={image.url}
               label={`Image ${index + 1}`}
-              isMain={index === 0}
+              isMain={showMain && index === 0}
               onRemove={() => onRemoveExisting(image.publicId)}
             />
           ))}
@@ -104,7 +105,7 @@ export default function ImageUploader({
               key={getFileKey(file)}
               file={file}
               label={file.name}
-              isMain={existing.length === 0 && index === 0}
+              isMain={showMain && existing.length === 0 && index === 0}
               onRemove={() => onRemoveNew(file)}
             />
           ))}
