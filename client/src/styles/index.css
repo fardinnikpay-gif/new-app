@@ -5,6 +5,7 @@
   --color-primary-light: #578ef5;
   --color-accent: #65d0f4;
   --color-ink: #000000;
+  --color-surface: #ffffff;
   --color-line: #e5e5e5;
   --color-line-strong: #d4d4d4;
   --spacing-header: 4rem;
@@ -18,7 +19,7 @@
 
   --animate-marquee: marquee 40s linear infinite;
   /* AA contrast (5.3:1) for text on white and for white text on it. Use `primary` for non-text accents. */
---color-primary-strong: #2064E0;
+  --color-primary-strong: #2064E0;
 
   @keyframes marquee {
     from {
@@ -30,10 +31,12 @@
     }
   }
 }
+
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
 @layer base {
   :root {
     color-scheme: light;

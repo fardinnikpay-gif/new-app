@@ -1,5 +1,5 @@
 // Editable site navigation. `category` must match the category value used by the backend.
-export const OVERLAY_HEADER_ROUTES = ["/"]; // routes whose first screen is a dark Hero (transparent header)
+export const OVERLAY_HEADER_ROUTES = []; // routes whose first screen is a dark Hero (transparent header)
 
 const makeCategory = (id, label) => ({
   id,
