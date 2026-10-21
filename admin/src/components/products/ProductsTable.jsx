@@ -7,7 +7,15 @@ import ProductRowActions from "./ProductRowActions";
 import StockBadge from "./StockBadge";
 
 const getImage = (product) => product.images?.[0]?.url ?? null;
-const getCategoryLabel = (category) => CATEGORY_LABELS[category] ?? category;
+const getCategoryLabel = (category) => {
+  if (!category) return "-";
+
+  if (typeof category === "object") {
+    return category.name ?? category.slug ?? "-";
+  }
+
+  return CATEGORY_LABELS[category] ?? category;
+};
 
 // Table from md up, cards below. Columns drop out as the screen narrows:
 // brand moves under the title below xl, category is hidden below lg.
