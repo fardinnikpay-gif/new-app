@@ -116,3 +116,42 @@ export const toggleActive = async (id) => {
   await product.save();
   return product;
 };
+
+
+export const getAdminProducts = async (query = {}) => {
+  const { getPagination } = await import("../utils/pagination.js");
+  const { page, limit, skip } = getPagination(query);
+
+  const filter = {};
+
+  if (query.search?.trim()) {
+    filter.$text = { $search: query.search.trim() };
+  }
+
+  if (query.isActive === "true") filter.isActive = true;
+  if (query.isActive === "false") filter.isActive = false;
+
+  const [products, total] = await Promise.all([
+    Product.find(filter)
+      .populate("category", "name slug")
+      .sort({ createdAt: -1, _id: -1 })
+      .skip(skip)
+      .limit(limit),
+    Product.countDocuments(filter),
+  ]);
+
+  return {
+    products,
+    total,
+    pages: Math.ceil(total / limit),
+    page,
+  };
+};
+
+export const getAdminProduct = async (id) => {
+  const product = await Product.findById(id).populate("category", "name slug");
+
+  if (!product) throw new ApiError(404, "Product not found");
+
+  return product;
+};

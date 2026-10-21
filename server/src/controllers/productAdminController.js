@@ -21,3 +21,13 @@ export const toggleActive = asyncHandler(async (req, res) => {
   const product = await productAdminService.toggleActive(req.params.id);
   sendSuccess(res, 200, "Product status updated", { product });
 });
+
+export const getAdminProducts = asyncHandler(async (req, res) => {
+  const result = await productAdminService.getAdminProducts(req.query);
+  sendSuccess(res, 200, "Admin products fetched", result);
+});
+
+export const getAdminProduct = asyncHandler(async (req, res) => {
+  const product = await productAdminService.getAdminProduct(req.params.id);
+  sendSuccess(res, 200, "Admin product fetched", { product });
+});
